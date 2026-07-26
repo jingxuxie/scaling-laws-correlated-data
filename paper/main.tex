@@ -1,0 +1,100 @@
+\documentclass[letterpaper]{article}
+
+\newif\ifofficialformat
+\IfFileExists{aaai2027.sty}{%
+  \officialformattrue
+  \usepackage[submission]{aaai2027}
+}{%
+  \officialformatfalse
+  \usepackage[margin=1in]{geometry}
+  \usepackage{newtxtext}
+}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{multirow}
+
+\graphicspath{{figures/}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\asympconst}{\mathrel{\asymp}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\eps}{\varepsilon}
+
+\title{Beyond Effective Sample Size:\\
+Spectral Scaling Laws for Persistent Data Streams}
+\author{Anonymous submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Power-law learning curves in linear regression are usually derived from
+independent samples, while dependent data are often summarized through a
+single effective sample size. We show that a scalar correction misses a
+qualitatively different regime: temporal persistence can change the scaling
+exponent when it is aligned with the feature spectrum. We introduce
+\emph{spectral renewal regression}, a persistent coordinate model with
+marginal covariance eigenvalues $\lambda_j\asymp j^{-a}$, mode durations
+$\tau_j\asymp j^r$, and target predictive energy
+$s_j=\lambda_j\theta_j^2\asymp j^{-b}$. All persistence profiles have the
+same one-time covariance. However, statistically new blocks arrive according
+to the innovation spectrum $q_j\propto\lambda_j/\tau_j\asymp
+j^{-(a+r)}$. For an $M$-coordinate block-averaging estimator trained on $B$
+innovation blocks, we derive an exact finite-sample bias--variance identity
+and prove
+\[
+\E\risk(\widehat\theta,\theta)
+=\Theta\!\left(
+M^{-(b-1)}+B^{-(b-1)/(a+r)}
++\sigma^2\frac{\min\{M,B^{1/(a+r)}\}}{B}
+\right).
+\]
+In the noiseless case, the first two terms are the exact minimax risk over a
+signed source class. A renewal-time sandwich further shows that, under
+finite-variance dwell times, the same noiseless exponent holds for a trajectory
+of exactly $N$ raw observations. Thus uniform persistence ($r=0$) preserves
+the usual data exponent, whereas increasingly persistent weak modes ($r>0$)
+replace $a$ by $a+r$. We give stationary semi-Markov and reversible Markov
+realizations, derive the full model--data scaling function, and verify the
+predicted exponents and phase collapse with exact calculations and Monte Carlo
+experiments. The result isolates when correlation merely changes
+constants and when it changes the rate at which new spectral directions
+become learnable.
+\end{abstract}
+
+\input{sections/01_introduction.tex}
+\input{sections/02_related_work.tex}
+\input{sections/03_model.tex}
+\input{sections/04_exact_risk.tex}
+\input{sections/05_minimax.tex}
+\input{sections/06_stationary_processes.tex}
+\input{sections/07_experiments.tex}
+\input{sections/08_discussion.tex}
+\input{sections/09_conclusion.tex}
+
+\ifofficialformat
+  \bibliographystyle{aaai2027}
+\else
+  \bibliographystyle{plain}
+\fi
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,38 @@
+{
+  "0.0": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_horizon": 16384,
+    "fit_start_horizon": 1024,
+    "fitted_slope": -0.39870779001273654,
+    "model_size": 65536,
+    "p": 2.0,
+    "predicted_slope": -0.4,
+    "r": 0.0,
+    "trials": 250
+  },
+  "0.4": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_horizon": 16384,
+    "fit_start_horizon": 1024,
+    "fitted_slope": -0.33867227567072045,
+    "model_size": 65536,
+    "p": 2.4,
+    "predicted_slope": -0.33333333333333337,
+    "r": 0.4,
+    "trials": 250
+  },
+  "0.8": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_horizon": 16384,
+    "fit_start_horizon": 1024,
+    "fitted_slope": -0.2896332535526913,
+    "model_size": 65536,
+    "p": 2.8,
+    "predicted_slope": -0.28571428571428575,
+    "r": 0.8,
+    "trials": 250
+  }
+}

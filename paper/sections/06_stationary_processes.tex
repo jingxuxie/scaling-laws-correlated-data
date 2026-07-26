@@ -1,0 +1,105 @@
+\section{Stationary Correlated-Stream Realizations}
+
+The block experiment has a direct stationary interpretation. Suppose first
+that integer durations $\ell_j\asymp j^r$ are used. Concatenate i.i.d. blocks
+with modes drawn from $q$ and durations $\ell_j$. Initialize the block
+containing time zero from the equilibrium size-biased distribution and choose
+its age uniformly within the block. This produces a stationary semi-Markov
+stream. Equation~\eqref{eq:occupancy} shows that its one-time covariance is
+$\sum_j\lambda_je_je_j^\top$.
+
+Let $N_B=\sum_{k=1}^B\ell_{J_k}$ be the raw duration of $B$ completed blocks.
+Then
+\begin{equation}
+\E N_B=\mu B,
+\qquad
+N_B/B\longrightarrow\mu\quad\text{almost surely}.
+\label{eq:renewal-slln}
+\end{equation}
+Consequently, indexing by expected raw observations changes constants but not
+any exponent. If $r<a-1$, the duration has finite variance and $N_B$ has
+ordinary square-root concentration. We keep Theorem~\ref{thm:exact-risk}
+indexed by completed innovations because it yields an exact finite-sample
+identity and avoids boundary effects from a partially observed final block.
+Almost-sure equivalence by itself does not imply an expected-risk equivalence:
+rare, unusually long blocks could dominate. The following result controls that
+possibility directly.
+
+\begin{theorem}[Fixed raw-horizon scaling]
+\label{thm:raw-horizon}
+Assume Equation~\eqref{eq:power-laws}, $\sigma=0$, and integer dwell times
+$\tau_j$. Start the concatenated stream at a renewal boundary and observe
+exactly $N$ raw examples. Let
+\begin{equation}
+T_N:=\min\left\{m\ge1:\sum_{k=1}^{m}\tau_{J_k}\ge N\right\}
+\label{eq:touched-blocks}
+\end{equation}
+be the number of blocks touched by the trajectory, including its final partial
+block, and apply Equation~\eqref{eq:estimator} to those $T_N$ blocks. If
+\begin{equation}
+r<a-1
+\qquad\text{and}\qquad
+1<b<a+r+1,
+\label{eq:raw-horizon-conditions}
+\end{equation}
+then, uniformly for $N,M\ge2$,
+\begin{equation}
+\E\risk(\widehat\theta^{(N)},\theta)
+\asympconst
+M^{-(b-1)}+N^{-(b-1)/(a+r)}.
+\label{eq:raw-horizon-rate}
+\end{equation}
+The same rate holds when the stream is initialized from its stationary
+equilibrium renewal distribution.
+\end{theorem}
+
+The condition $r<a-1$ is exactly the finite-second-moment condition for the
+block duration. The upper restriction on $b$ ensures that the target learning
+curve decays more slowly than the $O(N^{-1})$ probability of an anomalously
+small number of renewals. The proof, given in the technical supplement,
+sandwiches the random number of touched blocks between two deterministic
+multiples of $N$.
+
+A Markov realization makes the nonseparable covariance explicit. Consider
+states $(j,s)$ with $s\in\{-1,+1\}$ and transition kernel
+\begin{align}
+P((j,s),(k,t))
+={}&\left(1-\tau_j^{-1}\right)
+\1\{(j,s)=(k,t)\}
++\tau_j^{-1}\frac{q_k}{2}.
+\label{eq:markov-kernel}
+\end{align}
+
+\begin{proposition}[Reversible mode-dependent persistence]
+\label{prop:markov}
+The chain in Equation~\eqref{eq:markov-kernel} is reversible with stationary
+law $\pi_{j,s}=\lambda_j/2$. For $X_t=S_te_{J_t}$,
+\begin{equation}
+\E[X_tX_{t+\ell}^\top]
+=\sum_{j\ge1}\lambda_j
+\left(1-\tau_j^{-1}\right)^\ell e_je_j^\top.
+\label{eq:mode-autocovariance}
+\end{equation}
+Unless all $\tau_j$ are equal, this covariance cannot be written as a scalar
+time kernel multiplied by the spatial covariance.
+\end{proposition}
+
+\begin{proof}
+For distinct states,
+\[
+\pi_{j,s}P((j,s),(k,t))
+=\frac{\lambda_jq_k}{4\tau_j}
+=\frac{Zq_jq_k}{4},
+\]
+which is symmetric in $(j,s)$ and $(k,t)$; self-transitions are immediate.
+For the covariance, the only contribution correlated with $X_t$ is the event
+that no refresh occurs during the next $\ell$ steps. A refresh resamples a
+mean-zero sign, giving Equation~\eqref{eq:mode-autocovariance}.
+\end{proof}
+
+The proposition explains why a single sample-correlation matrix is
+insufficient here: each spatial mode carries a different temporal kernel.
+The exact noisy theorem uses deterministic or block-averaged durations;
+extending its sharp variance constants to geometric dwell times is discussed
+under limitations.
+

@@ -1,0 +1,87 @@
+\section{Spectral Renewal Regression}
+
+\subsection{Test risk and source energy}
+
+Let $(e_j)_{j\ge1}$ be an orthonormal basis. A fresh test covariate is
+\begin{equation}
+X=Se_J,
+\qquad
+\Prob(J=j)=\lambda_j,
+\qquad
+\Prob(S=1)=\Prob(S=-1)=\tfrac12,
+\label{eq:test-distribution}
+\end{equation}
+where $\lambda_j>0$ and $\sum_j\lambda_j=1$. For a target
+$\theta=(\theta_j)_{j\ge1}$, the noiseless label is
+$Y=\langle X,\theta\rangle$. The excess prediction risk is
+\begin{equation}
+\risk(\widehat\theta,\theta)
+:=\E_X\langle X,\widehat\theta-\theta\rangle^2
+=\sum_{j\ge1}\lambda_j(\widehat\theta_j-\theta_j)^2.
+\label{eq:risk}
+\end{equation}
+We write
+\begin{equation}
+s_j:=\lambda_j\theta_j^2
+\label{eq:source-energy}
+\end{equation}
+for the predictive energy of mode $j$.
+
+\subsection{Persistent training blocks}
+
+Associate mode $j$ with a persistence weight $\tau_j\ge1$ and define
+\begin{equation}
+Z:=\sum_{j\ge1}\frac{\lambda_j}{\tau_j},
+\qquad
+q_j:=\frac{\lambda_j/\tau_j}{Z}.
+\label{eq:q-def}
+\end{equation}
+Training consists of $B$ independent innovation blocks. Block $k$ draws
+$J_k\sim q$ and a Rademacher sign $S_k$, then supplies the block-averaged
+observation
+\begin{equation}
+\overline Y_k=S_k\theta_{J_k}+\overline\eps_k,
+\quad
+\E[\overline\eps_k\mid J_k=j]=0,
+\quad
+\E[\overline\eps_k^2\mid J_k=j]=\frac{\sigma^2}{\tau_j}.
+\label{eq:block-observation}
+\end{equation}
+For integer $\tau_j$, this is exactly the average of $\tau_j$ repeated labels
+with independent variance-$\sigma^2$ noise. For noninteger persistence,
+Equation~\eqref{eq:block-observation} is the corresponding effective block
+experiment; replacing $\tau_j$ by $\lceil\tau_j\rceil$ preserves all rates.
+
+The expected raw duration of a block is
+\begin{equation}
+\mu:=\sum_jq_j\tau_j=\frac1Z.
+\label{eq:mean-duration}
+\end{equation}
+Consequently, the fraction of expanded raw time spent in mode $j$ is
+\begin{equation}
+\frac{q_j\tau_j}{\mu}=\lambda_j.
+\label{eq:occupancy}
+\end{equation}
+Thus persistence changes temporal organization without changing the marginal
+training or test covariance.
+
+Let
+\begin{equation}
+K_j:=\sum_{k=1}^B\1\{J_k=j\}
+\label{eq:counts}
+\end{equation}
+be the number of innovation blocks in mode $j$. For a model restricted to the
+first $M$ coordinates, consider
+\begin{equation}
+\widehat\theta_j=
+\begin{cases}
+\displaystyle
+\frac1{K_j}\sum_{k:J_k=j}S_k\overline Y_k,&K_j>0,\\[6pt]
+0,&K_j=0,
+\end{cases}
+\qquad j\le M,
+\label{eq:estimator}
+\end{equation}
+with $\widehat\theta_j=0$ for $j>M$. This is both a sufficient-statistic
+estimator and coordinate-wise online averaging.
+

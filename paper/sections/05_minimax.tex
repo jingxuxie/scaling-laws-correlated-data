@@ -1,0 +1,49 @@
+\section{An Exact Information-Theoretic Lower Bound}
+
+The changed exponent is not caused by an inefficient learning algorithm. It
+is the exact minimax rate for a natural source class.
+
+Fix positive energies $(s_j)$ and define the signed class
+\begin{equation}
+\Theta_s
+:=\left\{\theta^\omega:
+\theta_j^\omega=\omega_j\sqrt{s_j/\lambda_j},\;
+\omega_j\in\{-1,+1\}\right\}.
+\label{eq:signed-class}
+\end{equation}
+Let $\mathcal A_M$ be the estimators whose output is supported on
+$\{1,\ldots,M\}$.
+
+\begin{theorem}[Exact noiseless minimax risk]
+\label{thm:minimax}
+When $\sigma=0$,
+\begin{equation}
+\inf_{\widetilde\theta\in\mathcal A_M}
+\sup_{\theta\in\Theta_s}
+\E\risk(\widetilde\theta,\theta)
+=
+\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B.
+\label{eq:minimax}
+\end{equation}
+The estimator in Equation~\eqref{eq:estimator} attains the equality.
+\end{theorem}
+
+\begin{proof}
+For the upper bound, an observed noiseless block reveals
+$S_k\overline Y_k=\theta_{J_k}$ exactly, so
+Equation~\eqref{eq:estimator} incurs $s_j$ precisely when $j>M$ or when
+$j\le M$ is unseen. Its risk is independent of the sign vector $\omega$.
+
+For the lower bound, put the product Rademacher prior on $\omega$. If mode
+$j\le M$ is unseen, the data are independent of $\omega_j$, the posterior
+remains symmetric, and the Bayes squared prediction error in that coordinate
+is at least $s_j$. This event has probability $(1-q_j)^B$. Coordinates
+$j>M$ incur $s_j$ because of the model restriction. Summing gives the
+right-hand side of Equation~\eqref{eq:minimax}; Bayes risk lower-bounds
+minimax risk.
+\end{proof}
+
+The theorem clarifies the role of data reuse. Repeated computation on the same
+$B$ blocks can reduce optimization error but cannot identify the sign of an
+unseen mode. The innovation spectrum sets an irreducible data-coverage floor.
+

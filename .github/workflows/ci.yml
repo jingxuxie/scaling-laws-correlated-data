@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: make test
+      - name: Run exact pilot smoke test
+        run: >-
+          PYTHONPATH=experiments python experiments/exact_risk.py
+          --model-size 4096 --max-power 14 --fit-points 5
+          --output-dir /tmp/exact-pilot
