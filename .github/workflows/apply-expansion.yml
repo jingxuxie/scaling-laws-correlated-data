@@ -1,0 +1,38 @@
+name: Apply paper expansion
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/expand-submission-paper
+          fetch-depth: 0
+      - name: Verify and apply expansion package
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .expansion_patch.part* | base64 -d > /tmp/expansion-patch.tar.xz
+          echo "ddaaf080c155606eb49706a2803869181a9444c4c453732d34475d35514fcdb7  /tmp/expansion-patch.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/expansion-patch.tar.xz -C .
+          rm -f .expansion_patch.part*
+          rm -f .github/workflows/apply-expansion.yml
+          rm -f .github/workflows/export-tree-sha.yml
+      - name: Commit expanded manuscript
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Expand AAAI paper with matched-IAT theory and compute scaling"
+          git push origin HEAD:agent/expand-submission-paper
