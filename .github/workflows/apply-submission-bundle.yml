@@ -58,3 +58,5 @@ jobs:
           git add -A
           git commit -m "Complete submission-ready theory and experiments"
           git push origin HEAD:${GITHUB_REF_NAME}
+
+# Retrigger after the workflow exists on the branch.
