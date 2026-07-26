@@ -67,11 +67,11 @@ required.
 
 ## AAAI format
 
-The repository does not redistribute conference style files. Download the
-official AAAI-27 author kit and place `aaai2027.sty` and `aaai2027.bst` in
-`paper/`. The source automatically uses the official submission style when
-those files are present and otherwise compiles in a readable one-column draft
-format.
+The repository already contains the official author kit under
+`AAAI_AuthorKit27/`. `make paper` adds that directory to `TEXINPUTS` and
+`BSTINPUTS`, so the manuscript uses the official submission style without
+copying or modifying the kit. Outside this repository, the same source falls
+back to a readable one-column draft when the style files are unavailable.
 
 ## Current scope
 
