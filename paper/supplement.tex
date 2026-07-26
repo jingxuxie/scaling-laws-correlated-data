@@ -1,0 +1,51 @@
+\documentclass[letterpaper]{article}
+
+\newif\ifofficialformat
+\IfFileExists{aaai2027.sty}{%
+  \officialformattrue
+  \usepackage[submission]{aaai2027}
+}{%
+  \officialformatfalse
+  \usepackage[margin=1in]{geometry}
+  \usepackage{newtxtext}
+}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{xr}
+\externaldocument{main}
+
+\graphicspath{{figures/}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\asympconst}{\mathrel{\asymp}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\eps}{\varepsilon}
+
+\title{Supplementary Material:\\
+Beyond Effective Sample Size: Spectral Scaling Laws for Persistent Data Streams}
+\author{Anonymous submission}
+
+\begin{document}
+\maketitle
+\appendix
+\input{appendix_content}
+\end{document}
