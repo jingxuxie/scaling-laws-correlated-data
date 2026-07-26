@@ -3,6 +3,8 @@ name: Apply research patch
 on:
   push:
     branches: [agent/submission-ready-v2]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
