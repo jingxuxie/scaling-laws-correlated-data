@@ -24,9 +24,11 @@ jobs:
           cat .expansion_patch.part* | base64 -d > /tmp/expansion-patch.tar.xz
           echo "ddaaf080c155606eb49706a2803869181a9444c4c453732d34475d35514fcdb7  /tmp/expansion-patch.tar.xz" | sha256sum -c -
           tar -xJf /tmp/expansion-patch.tar.xz -C .
+          # The workflow token can commit research files but GitHub blocks it
+          # from modifying workflow definitions. Restore those paths here;
+          # the connector applies the final workflow updates after this commit.
+          git restore --source=HEAD --worktree .github/workflows
           rm -f .expansion_patch.part*
-          rm -f .github/workflows/apply-expansion.yml
-          rm -f .github/workflows/export-tree-sha.yml
       - name: Commit expanded manuscript
         shell: bash
         run: |
