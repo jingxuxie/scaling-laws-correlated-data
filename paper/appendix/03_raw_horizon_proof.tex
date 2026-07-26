@@ -1,90 +1,154 @@
 \subsection{Proof of Theorem~\ref{thm:raw-horizon}}
 \label{app:raw-horizon}
 
-Let $L_k:=\tau_{J_k}$ and $A_m:=\sum_{k=1}^mL_k$. The variables $(L_k)$ are
-i.i.d. with mean $\mu$. Moreover,
+We first analyze a trajectory started at a renewal boundary.  For mode $j$,
+let
 \begin{equation}
-\E L_1^2
-=\sum_jq_j\tau_j^2
-=\frac1Z\sum_j\lambda_j\tau_j
-\asympconst\sum_j j^{-(a-r)}<\infty
-\label{eq:duration-second-moment}
+G_j:=\min\{k\ge1:J_k=j\},
+\qquad
+H_j:=\sum_{k=1}^{G_j-1}\tau_{J_k},
+\label{eq:first-hit-time}
 \end{equation}
-precisely when $r<a-1$. Write $v:=\operatorname{Var}(L_1)$ and
-$S_0:=\sum_js_j<\infty$.
-
-For a realized innovation sequence, define its noiseless missing-energy risk
-after $m$ blocks by
+so that $H_j$ is the raw time at which the first block of mode $j$ begins.
+Mode $j$ is unseen in the first $N$ raw observations exactly when $H_j\ge N$.
+Writing
 \begin{equation}
-\mathcal L_{m,M}
-:=\sum_{j>M}s_j
-+\sum_{j\le M}s_j
-\1\{j\notin\{J_1,\ldots,J_m\}\}.
-\label{eq:pathwise-missing-risk}
+u_j(N):=\Prob(H_j\ge N),
+\label{eq:unseen-raw}
 \end{equation}
-This quantity is nonincreasing in $m$, is bounded by $S_0$, and satisfies
-$\E\mathcal L_{m,M}$ equal to the right side of
-Equation~\eqref{eq:minimax}. Since one noiseless raw observation reveals the
-current signed coordinate, the fixed-horizon estimator has pathwise risk
-$\mathcal L_{T_N,M}$.
-
-For the upper bound, let $B_-:=\lfloor N/(2\mu)\rfloor$, with the finitely many
-values for which $B_-<1$ absorbed into constants. Monotonicity gives
+we therefore have the exact identity
 \begin{equation}
-\E\mathcal L_{T_N,M}
-\le \E\mathcal L_{B_-,M}
-+S_0\Prob(T_N<B_-).
-\label{eq:raw-upper-sandwich}
-\end{equation}
-The event $T_N<B_-$ implies $A_{B_-}\ge N$. Since
-$\E A_{B_-}=\mu B_-\le N/2$, Chebyshev's inequality yields
-\begin{equation}
-\Prob(T_N<B_-)
-\le\Prob(A_{B_-}-\E A_{B_-}\ge N/2)
-\le\frac{4vB_-}{N^2}
-=O(N^{-1}).
-\label{eq:few-renewals}
+\E\risk(\widehat\theta^{(N)},\theta)
+=\sum_{j>M}s_j+\sum_{j\le M}s_j u_j(N).
+\label{eq:raw-exact-missing}
 \end{equation}
 
-For the lower bound, take $B_+:=\lceil2N/\mu\rceil$. Again by monotonicity,
+The key observation is that $u_j(N)$ can be controlled mode by mode without
+concentrating the total renewal count.  Conditional on a failure
+$J_k\ne j$, the mean dwell time is
 \begin{equation}
-\E\mathcal L_{T_N,M}
-\ge \E\mathcal L_{B_+,M}
--S_0\Prob(T_N>B_+).
-\label{eq:raw-lower-sandwich}
+\mu_{-j}
+=\frac{\mu-q_j\tau_j}{1-q_j}.
+\label{eq:failure-duration-mean}
 \end{equation}
-Now $T_N>B_+$ implies $A_{B_+}<N$. Let
-$\phi(t):=\E e^{-tL_1}$. Finite mean gives
-$\log\phi(t)=-\mu t+o(t)$ as $t\downarrow0$, so for some fixed small $t>0$,
-$\log\phi(t)\le-3\mu t/4$. Chernoff's bound then gives
+The number $G_j-1$ of failures before the first success is geometric with
+mean $(1-q_j)/q_j$, and the failure modes are i.i.d. from the conditional law.
+Consequently,
 \begin{equation}
-\Prob(T_N>B_+)
-\le e^{tN}\phi(t)^{B_+}
-\le e^{-tN/2}.
-\label{eq:many-renewals}
+\E H_j
+=\frac{1-q_j}{q_j}\mu_{-j}
+=\frac{\mu}{q_j}-\tau_j
+\le \frac{\mu}{q_j}.
+\label{eq:hitting-time-mean}
+\end{equation}
+Markov's inequality gives
+\begin{equation}
+ u_j(N)\le \min\left\{1,\frac{\mu}{Nq_j}\right\}.
+\label{eq:hitting-upper}
+\end{equation}
+For the reverse direction, every dwell time is at least one.  If the first
+$N$ innovation modes all avoid $j$, then the first $j$-block cannot start
+before raw time $N$.  Hence
+\begin{equation}
+ u_j(N)\ge (1-q_j)^N.
+\label{eq:hitting-lower}
+\end{equation}
+These two elementary inequalities are sufficient for the sharp rate.
+
+Put $p=a+r$ and $J_N=N^{1/p}$.  Since $q_j\asympconst j^{-p}$ and
+$s_j\asympconst j^{-b}$, Equation~\eqref{eq:hitting-upper} yields
+\begin{equation}
+\sum_{j\le M}s_j u_j(N)
+\lesssim
+\sum_{j\le M}j^{-b}\min\{1,j^p/N\}.
+\label{eq:raw-upper-sum}
+\end{equation}
+If $M\le J_N$, the right-hand side is at most
+\begin{equation}
+\frac{C}{N}\sum_{j\le M}j^{p-b}
+\lesssim \frac{M^{p-b+1}}{N}
+\le C M^{1-b},
+\label{eq:raw-upper-small-M}
+\end{equation}
+where $b<p+1$ is used in the sum.  If $M>J_N$, splitting at $J_N$ gives
+\begin{align}
+\sum_{j\le M}s_j u_j(N)
+&\lesssim
+\frac1N\sum_{j\le J_N}j^{p-b}
++\sum_{j>J_N}j^{-b}
+\nonumber\\
+&\lesssim N^{-(b-1)/p}.
+\label{eq:raw-upper-large-M}
+\end{align}
+Together with $\sum_{j>M}s_j\asympconst M^{1-b}$, this proves the desired
+upper bound.
+
+For the lower bound, the approximation term always contributes
+$cM^{1-b}$.  If $M\le C_0J_N$, this term is also at least a constant multiple
+of $N^{-(b-1)/p}$.  Otherwise choose $C_0$ large enough that
+$q_j\le(2N)^{-1}$ throughout an annulus
+$j\in[C_0J_N,2C_0J_N]\subseteq[1,M]$.  Equation~\eqref{eq:hitting-lower}
+then gives
+\begin{equation}
+ u_j(N)\ge\left(1-\frac1{2N}\right)^N\ge c,
+\label{eq:annulus-unseen}
+\end{equation}
+and summing over the annulus yields
+\begin{equation}
+\sum_{j\le M}s_j u_j(N)
+\gtrsim J_N^{1-b}
+=N^{-(b-1)/p}.
+\label{eq:raw-annulus-lower}
+\end{equation}
+This proves Equation~\eqref{eq:raw-horizon-rate} for every $r\ge0$; no
+moment beyond $\E\tau_J=\mu<\infty$ is required.
+
+\paragraph{Equilibrium initialization.}
+Let $J_0$ denote the mode occupying time zero and let $R$ be its forward
+recurrence time.  The equilibrium law is
+\begin{equation}
+\Prob(J_0=j)=\frac{q_j\tau_j}{\mu}=\lambda_j,
+\label{eq:equilibrium-mode-law}
+\end{equation}
+and, conditional on $J_0=j$, $R$ is uniform on
+$\{1,\ldots,\tau_j\}$.  For $r>0$ this implies
+\begin{align}
+\Prob(R\ge N)
+&=\sum_j\lambda_j
+\frac{(\tau_j-N+1)_+}{\tau_j}
+\asympconst N^{-(a-1)/r}.
+\label{eq:residual-tail}
+\end{align}
+Indeed, the upper bound follows by summing $\lambda_j$ over
+$j\gtrsim N^{1/r}$, while the lower bound restricts to modes with
+$\tau_j\ge2N$, for which the conditional survival probability is at least
+$1/2$.  If $r=0$, the dwell times are uniformly bounded and the residual term
+vanishes for sufficiently large $N$.
+
+Let $\delta=(a-1)/r$ when $r>0$.  On the event $R\le N/2$, the future
+trajectory contains at least $N/2$ raw observations from an independent
+renewal boundary, and the initially observed mode can only reduce noiseless
+risk.  On $R>N/2$, risk is bounded by $S_0:=\sum_js_j$.  The boundary result
+therefore gives
+\begin{equation}
+\E\risk(\widehat\theta^{(N)}_{\rm eq},\theta)
+\lesssim M^{1-b}+N^{-(b-1)/p}+\Prob(R>N/2)
+\lesssim M^{1-b}+N^{-(b-1)/p}+N^{-\delta}.
+\label{eq:stationary-upper}
 \end{equation}
 
-Both $B_-$ and $B_+$ are constant multiples of $N$. Applying the noiseless
-part of Theorem~\ref{thm:scaling} to
-Equations~\eqref{eq:raw-upper-sandwich} and
-\eqref{eq:raw-lower-sandwich} gives the desired rate, because
-$\beta:=(b-1)/(a+r)<1$ under
-Equation~\eqref{eq:raw-horizon-conditions}, and hence the $O(N^{-1})$ and
-exponential errors are negligible relative to $N^{-\beta}$.
-
-For equilibrium initialization, the initial forward recurrence time has finite
-mean whenever $\E L_1^2<\infty$. Its probability of exceeding $N/2$ is therefore
-$O(N^{-1})$. Conditional on a shorter initial residual, the remaining stream is
-an ordinary renewal process of length at least $N/2$, so the upper sandwich
-applies with different constants. For the lower bound, the equilibrium block
-adds one mode $J_0\sim\lambda$ before the ordinary renewal sequence. Its expected
-reduction of the $B$-block missing energy is at most
+For a matching innovation lower bound, take the same critical annulus as
+above.  For each mode in it, the event that $J_0\ne j$ and the first $N$
+future innovation modes avoid $j$ has probability
 \begin{equation}
-\sum_j s_j\lambda_j(1-q_j)^B
-\le C\sum_j j^{-(a+b)}e^{-cBj^{-(a+r)}}
-=O\!\left(B^{-(a+b-1)/(a+r)}\right),
-\label{eq:equilibrium-initial-mode}
+(1-\lambda_j)(1-q_j)^N\ge c.
+\label{eq:stationary-annulus-event}
 \end{equation}
-which is $o(B^{-(b-1)/(a+r)})$. Combining this term with the same exponential
-lower-tail bound for subsequent renewals proves the stationary version.
-
+At most $N$ future blocks can begin in $N$ raw observations, so this event
+implies that $j$ is unseen.  It contributes
+$cN^{-(b-1)/p}$.  Finally, on $R\ge N$ no renewal occurs during the horizon.
+For all sufficiently large $N$, such an initial mode is not mode one, so mode
+one remains unseen and contributes at least $s_1$.  Equation~\eqref{eq:residual-tail}
+therefore gives a second lower bound $cN^{-\delta}$.  Combining these two
+bounds using $\max\{x,y\}\ge(x+y)/2$, and adding the approximation tail,
+proves Equation~\eqref{eq:stationary-raw-rate}.

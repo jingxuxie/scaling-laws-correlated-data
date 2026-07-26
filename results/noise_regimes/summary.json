@@ -1,0 +1,30 @@
+{
+  "hard": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_block": 4194304,
+    "fit_start_block": 131072,
+    "fitted_model_exponent": 0.35435644158830376,
+    "fitted_risk_exponent": 0.284413002381195,
+    "name": "hard",
+    "p": 2.8,
+    "predicted_model_exponent": 0.35714285714285715,
+    "predicted_risk_exponent": 0.28571428571428575,
+    "r": 0.8,
+    "sigma": 0.35
+  },
+  "smooth": {
+    "a": 2.0,
+    "b": 4.0,
+    "fit_end_block": 4194304,
+    "fit_start_block": 131072,
+    "fitted_model_exponent": 0.26188860903136485,
+    "fitted_risk_exponent": 0.7649927474458517,
+    "name": "smooth",
+    "p": 2.8,
+    "predicted_model_exponent": 0.25,
+    "predicted_risk_exponent": 0.75,
+    "r": 0.8,
+    "sigma": 0.35
+  }
+}
