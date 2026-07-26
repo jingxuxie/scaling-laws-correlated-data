@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fill the official AAAI reproducibility checklist without modifying its questions."""
+"""Fill the official AAAI reproducibility checklist without changing questions."""
 
 from __future__ import annotations
 
@@ -7,8 +7,10 @@ import argparse
 from pathlib import Path
 
 
-# Responses follow the order of ``Type your response here`` occurrences in the
-# unmodified AAAI-27 ReproducibilityChecklist.tex file.
+# Responses follow the order of the question placeholders after the official
+# ``% The questions start here`` sentinel.  The template's instructions also
+# mention the placeholder text, so counting/replacing over the whole document
+# would corrupt the unmodified explanatory preamble.
 ANSWERS = [
     # General paper structure.
     "yes",
@@ -50,18 +52,30 @@ ANSWERS = [
 
 def fill_checklist(template: str) -> str:
     marker = "Type your response here"
-    count = template.count(marker)
+    sentinel = "% The questions start here"
+
+    if sentinel in template:
+        preamble, questions = template.split(sentinel, 1)
+        prefix = preamble + sentinel
+    else:
+        # Keep the helper easy to unit-test on a synthetic question-only input.
+        prefix = ""
+        questions = template
+
+    count = questions.count(marker)
     if count != len(ANSWERS):
         raise ValueError(
-            f"expected {len(ANSWERS)} checklist response slots, found {count}; "
-            "the official template may have changed"
+            f"expected {len(ANSWERS)} checklist response slots after the "
+            f"question sentinel, found {count}; the official template may "
+            "have changed"
         )
-    output = template
+
+    completed_questions = questions
     for answer in ANSWERS:
-        output = output.replace(marker, answer, 1)
-    if marker in output:
-        raise AssertionError("unfilled checklist response remains")
-    return output
+        completed_questions = completed_questions.replace(marker, answer, 1)
+    if marker in completed_questions:
+        raise AssertionError("unfilled checklist response remains in question block")
+    return prefix + completed_questions
 
 
 def parse_args() -> argparse.Namespace:
