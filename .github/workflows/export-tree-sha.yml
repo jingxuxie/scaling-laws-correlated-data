@@ -1,0 +1,23 @@
+name: Export tree SHA
+
+on:
+  push:
+    branches:
+      - agent/expand-submission-paper
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record Git tree
+        run: git rev-parse HEAD^{tree} > /tmp/tree-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tree-sha
+          path: /tmp/tree-sha.txt
+          if-no-files-found: error
+          retention-days: 1
