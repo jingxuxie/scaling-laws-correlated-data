@@ -1,0 +1,16 @@
+{
+  "a": 2.0,
+  "b": 4.5,
+  "boundary_fitted_exponent": 0.6973319400328248,
+  "boundary_predicted_exponent": 0.7,
+  "fit_end_horizon": 8192,
+  "fit_start_horizon": 512,
+  "model_size": 65536,
+  "p": 5.0,
+  "r": 3.0,
+  "residual_fitted_exponent": 0.33183888735323797,
+  "residual_predicted_exponent": 0.3333333333333333,
+  "stationary_fitted_exponent": 0.381468904966587,
+  "stationary_predicted_exponent": 0.3333333333333333,
+  "trials": 3000
+}

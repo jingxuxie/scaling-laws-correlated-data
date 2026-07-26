@@ -25,40 +25,56 @@ Almost-sure equivalence by itself does not imply an expected-risk equivalence:
 rare, unusually long blocks could dominate. The following result controls that
 possibility directly.
 
-\begin{theorem}[Fixed raw-horizon scaling]
+\begin{theorem}[Fixed raw horizon and the inspection paradox]
 \label{thm:raw-horizon}
-Assume Equation~\eqref{eq:power-laws}, $\sigma=0$, and integer dwell times
-$\tau_j$. Start the concatenated stream at a renewal boundary and observe
-exactly $N$ raw examples. Let
+Assume Equation~\eqref{eq:power-laws}, $\sigma=0$, integer dwell times
+$\tau_j\ge1$, and
 \begin{equation}
-T_N:=\min\left\{m\ge1:\sum_{k=1}^{m}\tau_{J_k}\ge N\right\}
-\label{eq:touched-blocks}
-\end{equation}
-be the number of blocks touched by the trajectory, including its final partial
-block, and apply Equation~\eqref{eq:estimator} to those $T_N$ blocks. If
-\begin{equation}
-r<a-1
-\qquad\text{and}\qquad
-1<b<a+r+1,
+1<b<a+r+1.
 \label{eq:raw-horizon-conditions}
 \end{equation}
-then, uniformly for $N,M\ge2$,
+First start the concatenated stream at a renewal boundary and observe exactly
+$N$ raw examples.  For every $r\ge0$, uniformly for $N,M\ge2$,
 \begin{equation}
 \E\risk(\widehat\theta^{(N)},\theta)
 \asympconst
 M^{-(b-1)}+N^{-(b-1)/(a+r)}.
 \label{eq:raw-horizon-rate}
 \end{equation}
-The same rate holds when the stream is initialized from its stationary
-equilibrium renewal distribution.
+No finite-variance assumption on the dwell time is needed.
+
+Now initialize the stream from its stationary equilibrium renewal law.  If
+$r>0$, then
+\begin{equation}
+\E\risk(\widehat\theta^{(N)}_{\rm eq},\theta)
+\asympconst
+M^{-(b-1)}+N^{-(b-1)/(a+r)}+N^{-(a-1)/r}.
+\label{eq:stationary-raw-rate}
+\end{equation}
+For $r=0$, the last term is absent.  Thus equilibrium initialization preserves
+the boundary-start exponent when $(b-1)/(a+r)<(a-1)/r$, but otherwise the
+forward recurrence time creates a slower inspection-paradox phase.
 \end{theorem}
 
-The condition $r<a-1$ is exactly the finite-second-moment condition for the
-block duration. The upper restriction on $b$ ensures that the target learning
-curve decays more slowly than the $O(N^{-1})$ probability of an anomalously
-small number of renewals. The proof, given in the technical supplement,
-sandwiches the random number of touched blocks between two deterministic
-multiples of $N$.
+The proof follows individual mode-hitting times rather than concentrating the
+total number of renewals.  If $H_j$ is the raw start time of the first block in
+mode $j$, then
+\begin{equation}
+\E H_j=\mu/q_j-\tau_j\le\mu/q_j,
+\qquad
+(1-q_j)^N\le\Prob(H_j\ge N)
+\le\min\{1,\mu/(Nq_j)\}.
+\label{eq:hitting-summary}
+\end{equation}
+Summing these inequalities against $s_j$ gives
+Equation~\eqref{eq:raw-horizon-rate} for all $r$.  Under stationary
+initialization, the residual duration $R$ of the initial size-biased block has
+\begin{equation}
+\Prob(R\ge N)\asympconst N^{-(a-1)/r},
+\label{eq:inspection-tail-main}
+\end{equation}
+which yields the additional term in Equation~\eqref{eq:stationary-raw-rate}.
+The technical supplement gives matching upper and lower bounds.
 
 A Markov realization makes the nonseparable covariance explicit. Consider
 states $(j,s)$ with $s\in\{-1,+1\}$ and transition kernel
