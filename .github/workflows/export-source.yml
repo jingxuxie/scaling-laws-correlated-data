@@ -13,10 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Package source tree
-        run: tar --exclude=.git -czf source-tree.tar.gz .
+        run: tar --exclude=.git -czf /tmp/source-tree.tar.gz .
       - uses: actions/upload-artifact@v4
         with:
           name: branch-source
-          path: source-tree.tar.gz
+          path: /tmp/source-tree.tar.gz
           if-no-files-found: error
           retention-days: 1
