@@ -1,0 +1,41 @@
+PART SIZES
+ 8000 .research_patch.part00
+16000 .research_patch.part01
+16000 .research_patch.part02
+16000 .research_patch.part03
+ 8564 .research_patch.part04
+64564 total
+COMBINED SIZE
+64564 /tmp/combined.b64
+DECODE
+decode_status=0
+-rw-r--r-- 1 runner runner 48421 Jul 26 03:35 /tmp/submission-patch.tar.gz
+33432589cfde0d0261e5339df044182c9e494a413318bf79214171ef41db9239  /tmp/submission-patch.tar.gz
+GZIP TEST
+gzip_status=0
+TAR LIST
+paper/appendix/03_raw_horizon_proof.tex
+paper/sections/06_stationary_processes.tex
+requirements.txt
+.github/workflows/real-data.yml
+experiments/dense_features.py
+experiments/heavy_tail_horizon.py
+experiments/noise_regimes.py
+experiments/real_sequential.py
+experiments/test_dense_features.py
+experiments/test_heavy_tail_horizon.py
+experiments/test_noise_regimes.py
+experiments/test_real_sequential.py
+results/dense_features/
+results/dense_features/dense_features.pdf
+results/dense_features/dense_features.csv
+results/dense_features/summary.json
+results/heavy_tail_horizon/
+results/heavy_tail_horizon/heavy_tail_horizon.csv
+results/heavy_tail_horizon/heavy_tail_horizon.pdf
+results/heavy_tail_horizon/summary.json
+results/noise_regimes/
+results/noise_regimes/noise_regimes.csv
+results/noise_regimes/noise_regimes.pdf
+results/noise_regimes/summary.json
+tar_status=0
