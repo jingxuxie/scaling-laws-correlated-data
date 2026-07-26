@@ -1,4 +1,4 @@
-name: Apply research patch
+name: Diagnose research patch
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  apply:
+  diagnose:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -18,15 +18,29 @@ jobs:
         with:
           ref: agent/submission-ready-v2
           fetch-depth: 0
-      - name: Reconstruct and apply research patch
+      - name: Diagnose packaged patch
         run: |
-          cat .research_patch.part* | base64 -d > /tmp/submission-patch.tar.gz
-          tar -xzf /tmp/submission-patch.tar.gz
-          rm .research_patch.part*
-          rm .github/workflows/apply-local-patch.yml
-          rm -f .github/workflows/export-source.yml
+          set +e
+          cat .research_patch.part* > /tmp/combined.b64
+          {
+            echo 'PART SIZES'
+            wc -c .research_patch.part*
+            echo 'COMBINED SIZE'
+            wc -c /tmp/combined.b64
+            echo 'DECODE'
+            base64 -d /tmp/combined.b64 > /tmp/submission-patch.tar.gz
+            echo "decode_status=$?"
+            ls -l /tmp/submission-patch.tar.gz
+            sha256sum /tmp/submission-patch.tar.gz
+            echo 'GZIP TEST'
+            gzip -t /tmp/submission-patch.tar.gz
+            echo "gzip_status=$?"
+            echo 'TAR LIST'
+            tar -tzf /tmp/submission-patch.tar.gz | head -40
+            echo "tar_status=${PIPESTATUS[0]}"
+          } > patch-diagnostic.txt 2>&1
           git config user.name "OpenAI Research Agent"
           git config user.email "research-agent@openai.com"
-          git add -A
-          git commit -m "Add heavy-tail theory and submission experiments"
+          git add patch-diagnostic.txt
+          git commit -m "Diagnose packaged research patch"
           git push origin HEAD:agent/submission-ready-v2
