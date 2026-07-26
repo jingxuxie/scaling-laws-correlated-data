@@ -1,0 +1,41 @@
+{
+  "0.0": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_block": 33554432,
+    "fit_start_block": 524288,
+    "fitted_intercept": -0.32985853447110725,
+    "fitted_slope": -0.39999915061946706,
+    "mean_block_length": 1.0,
+    "model_size": 262144,
+    "p": 2.0,
+    "predicted_slope": -0.4,
+    "r": 0.0
+  },
+  "0.4": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_block": 33554432,
+    "fit_start_block": 524288,
+    "fitted_intercept": -0.41433899152168324,
+    "fitted_slope": -0.3333332424649347,
+    "mean_block_length": 1.1891007759469754,
+    "model_size": 262144,
+    "p": 2.4,
+    "predicted_slope": -0.33333333333333337,
+    "r": 0.4
+  },
+  "0.8": {
+    "a": 2.0,
+    "b": 1.8,
+    "fit_end_block": 33554432,
+    "fit_start_block": 524288,
+    "fitted_intercept": -0.45188022060234173,
+    "fitted_slope": -0.2857142120959318,
+    "mean_block_length": 1.3190798863685282,
+    "model_size": 262144,
+    "p": 2.8,
+    "predicted_slope": -0.28571428571428575,
+    "r": 0.8
+  }
+}
