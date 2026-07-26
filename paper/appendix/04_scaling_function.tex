@@ -1,0 +1,59 @@
+\subsection{Exact model--data scaling function}
+
+For exact powers
+\begin{equation}
+q_j=c_qj^{-p},
+\qquad
+s_j=c_sj^{-b},
+\label{eq:exact-powers}
+\end{equation}
+and $\sigma=0$, suppose
+$M/B^{1/p}\to m\in(0,\infty]$. Then
+\begin{theorem}[Scaling function]
+\label{thm:scaling-function}
+\begin{align}
+&B^{(b-1)/p}
+\left(
+\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B
+\right)
+\nonumber\\
+&\quad\longrightarrow
+c_s\left[
+\int_0^m x^{-b}e^{-c_qx^{-p}}\,dx
++\frac{m^{1-b}}{b-1}
+\right],
+\label{eq:scaling-function}
+\end{align}
+where the second term is interpreted as zero when $m=\infty$. In particular,
+for $m=\infty$ the limit is
+\begin{equation}
+\frac{c_s}{p}c_q^{(1-b)/p}
+\Gamma\!\left(\frac{b-1}{p}\right).
+\label{eq:gamma-constant}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Set $J=B^{1/p}$ and write $j=Jx$. Since
+$Bq_j=c_q(j/J)^{-p}$ and
+$B\log(1-q_j)=-Bq_j+O(Bq_j^2)$, the summand in the transition region converges
+to $c_sx^{-b}e^{-c_qx^{-p}}$. After multiplying by
+$B^{(b-1)/p}=J^{b-1}$, the sum is a Riemann sum with mesh $1/J$.
+For $x$ bounded away from zero and infinity, convergence is uniform. Near
+zero, $x^{-b}e^{-c x^{-p}}$ is integrable and dominates dyadic shells; near
+infinity, $x^{-b}$ is integrable because $b>1$. The approximation tail obeys
+$J^{b-1}\sum_{j>M}c_sj^{-b}\to c_sm^{1-b}/(b-1)$ by the integral test.
+Finally, substituting $u=c_qx^{-p}$ evaluates the infinite integral as
+Equation~\eqref{eq:gamma-constant}.
+\end{proof}
+
+\subsection{Proof of Corollary~\ref{cor:model-choice}}
+
+Write $p=a+r$. At $M\asymp B^{1/p}$, the variance term is
+$\sigma^2B^{-(p-1)/p}$. If $b<p$, then
+$(b-1)/p<(p-1)/p$, so coverage bias decays more slowly and determines the
+rate. If $b>p$, an optimizer lies in the model-limited region $M<B^{1/p}$,
+where the relevant terms are $M^{1-b}+\sigma^2M/B$. Balancing them gives
+$M^b\asymp B/\sigma^2$ and the stated risk. Since $b>p$, this $M$ is indeed
+$o(B^{1/p})$.
+

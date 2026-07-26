@@ -1,0 +1,53 @@
+\section{Additional Experimental Details}
+\label{app:experiments}
+
+The exact experiment uses
+\[
+\lambda_j=\frac{j^{-a}}{\zeta(a)},
+\quad
+q_j=\frac{j^{-(a+r)}}{\zeta(a+r)},
+\quad
+s_j=\frac{j^{-b}}{\zeta(b)}.
+\]
+The infinite model tail is computed by the Hurwitz zeta function. The leading
+infinite-model asymptotic constant used as a numerical check is
+\begin{equation}
+C_{a,b,r}
+=\frac{1}{\zeta(b)(a+r)}
+\zeta(a+r)^{(b-1)/(a+r)}
+\Gamma\!\left(\frac{b-1}{a+r}\right).
+\end{equation}
+
+Figure~\ref{fig:mc} samples the infinite Zipf law directly. Each marker is the
+mean conditional risk over 400 independently sampled datasets. The solid
+curves are the exact finite-$B$ expression, not asymptotic fits.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{monte_carlo_validation.pdf}
+\caption{Monte Carlo samples of the persistent block process agree with the
+exact risk identity.}
+\label{fig:mc}
+\end{figure}
+
+For the raw-horizon experiment, deterministic integer dwell times are
+$\ell_j=\lceil j^r\rceil$ and innovations are sampled exactly from
+$q_j\propto j^{-a}/\ell_j$ by rejection sampling from a Zipf$(a+r)$ proposal.
+Each trajectory stops when its accumulated duration first reaches $N$; the
+partially observed final block counts as touched. Figure~\ref{fig:raw-horizon}
+shows that random stopping changes finite-scale constants but not the predicted
+slopes in the finite-variance regime.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{raw_horizon_validation.pdf}
+\caption{Monte Carlo validation at a fixed raw trajectory length. Error bars
+show standard errors over 250 independent trajectories.}
+\label{fig:raw-horizon}
+\end{figure}
+
+The repository contains deterministic seeds, CSV outputs, unit tests, and a
+single command that regenerates all figures. The tests check normalization,
+monotonicity in $B$ and $M$, asymptotic slope recovery, recovery of total prior
+energy at $B=0$, Monte Carlo agreement, and increased risk under label noise.
+

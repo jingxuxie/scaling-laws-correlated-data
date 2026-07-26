@@ -1,0 +1,90 @@
+\subsection{Proof of Theorem~\ref{thm:raw-horizon}}
+\label{app:raw-horizon}
+
+Let $L_k:=\tau_{J_k}$ and $A_m:=\sum_{k=1}^mL_k$. The variables $(L_k)$ are
+i.i.d. with mean $\mu$. Moreover,
+\begin{equation}
+\E L_1^2
+=\sum_jq_j\tau_j^2
+=\frac1Z\sum_j\lambda_j\tau_j
+\asympconst\sum_j j^{-(a-r)}<\infty
+\label{eq:duration-second-moment}
+\end{equation}
+precisely when $r<a-1$. Write $v:=\operatorname{Var}(L_1)$ and
+$S_0:=\sum_js_j<\infty$.
+
+For a realized innovation sequence, define its noiseless missing-energy risk
+after $m$ blocks by
+\begin{equation}
+\mathcal L_{m,M}
+:=\sum_{j>M}s_j
++\sum_{j\le M}s_j
+\1\{j\notin\{J_1,\ldots,J_m\}\}.
+\label{eq:pathwise-missing-risk}
+\end{equation}
+This quantity is nonincreasing in $m$, is bounded by $S_0$, and satisfies
+$\E\mathcal L_{m,M}$ equal to the right side of
+Equation~\eqref{eq:minimax}. Since one noiseless raw observation reveals the
+current signed coordinate, the fixed-horizon estimator has pathwise risk
+$\mathcal L_{T_N,M}$.
+
+For the upper bound, let $B_-:=\lfloor N/(2\mu)\rfloor$, with the finitely many
+values for which $B_-<1$ absorbed into constants. Monotonicity gives
+\begin{equation}
+\E\mathcal L_{T_N,M}
+\le \E\mathcal L_{B_-,M}
++S_0\Prob(T_N<B_-).
+\label{eq:raw-upper-sandwich}
+\end{equation}
+The event $T_N<B_-$ implies $A_{B_-}\ge N$. Since
+$\E A_{B_-}=\mu B_-\le N/2$, Chebyshev's inequality yields
+\begin{equation}
+\Prob(T_N<B_-)
+\le\Prob(A_{B_-}-\E A_{B_-}\ge N/2)
+\le\frac{4vB_-}{N^2}
+=O(N^{-1}).
+\label{eq:few-renewals}
+\end{equation}
+
+For the lower bound, take $B_+:=\lceil2N/\mu\rceil$. Again by monotonicity,
+\begin{equation}
+\E\mathcal L_{T_N,M}
+\ge \E\mathcal L_{B_+,M}
+-S_0\Prob(T_N>B_+).
+\label{eq:raw-lower-sandwich}
+\end{equation}
+Now $T_N>B_+$ implies $A_{B_+}<N$. Let
+$\phi(t):=\E e^{-tL_1}$. Finite mean gives
+$\log\phi(t)=-\mu t+o(t)$ as $t\downarrow0$, so for some fixed small $t>0$,
+$\log\phi(t)\le-3\mu t/4$. Chernoff's bound then gives
+\begin{equation}
+\Prob(T_N>B_+)
+\le e^{tN}\phi(t)^{B_+}
+\le e^{-tN/2}.
+\label{eq:many-renewals}
+\end{equation}
+
+Both $B_-$ and $B_+$ are constant multiples of $N$. Applying the noiseless
+part of Theorem~\ref{thm:scaling} to
+Equations~\eqref{eq:raw-upper-sandwich} and
+\eqref{eq:raw-lower-sandwich} gives the desired rate, because
+$\beta:=(b-1)/(a+r)<1$ under
+Equation~\eqref{eq:raw-horizon-conditions}, and hence the $O(N^{-1})$ and
+exponential errors are negligible relative to $N^{-\beta}$.
+
+For equilibrium initialization, the initial forward recurrence time has finite
+mean whenever $\E L_1^2<\infty$. Its probability of exceeding $N/2$ is therefore
+$O(N^{-1})$. Conditional on a shorter initial residual, the remaining stream is
+an ordinary renewal process of length at least $N/2$, so the upper sandwich
+applies with different constants. For the lower bound, the equilibrium block
+adds one mode $J_0\sim\lambda$ before the ordinary renewal sequence. Its expected
+reduction of the $B$-block missing energy is at most
+\begin{equation}
+\sum_j s_j\lambda_j(1-q_j)^B
+\le C\sum_j j^{-(a+b)}e^{-cBj^{-(a+r)}}
+=O\!\left(B^{-(a+b-1)/(a+r)}\right),
+\label{eq:equilibrium-initial-mode}
+\end{equation}
+which is $o(B^{-(b-1)/(a+r)})$. Combining this term with the same exponential
+lower-tail bound for subsequent renewals proves the stationary version.
+
