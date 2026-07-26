@@ -1,9 +1,8 @@
 name: Export tree SHA
 
 on:
-  push:
-    branches:
-      - agent/expand-submission-paper
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
