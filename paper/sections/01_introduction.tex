@@ -1,0 +1,72 @@
+\section{Introduction}
+
+Scaling laws summarize how predictive loss decreases as models, data, and
+compute grow. They have become an empirical planning tool for large language
+models \cite{kaplan2020scaling,hoffmann2022training} and a theoretical target
+for random features, kernels, and linear regression
+\cite{bahri2024explaining,maloney2022solvable,bordelon2020spectrum,lin2024scaling}.
+A recurring spectral picture is that larger datasets resolve progressively
+weaker eigenmodes of the data distribution. With covariance spectrum
+$\lambda_j\asymp j^{-a}$ and target energy $s_j\asymp j^{-b}$, the largest
+learnable index is typically a power of the sample size; summing the unresolved
+target tail then produces a power-law learning curve.
+
+Most scaling-law theories assume independent samples. Yet many practically
+important datasets are trajectories: financial and physical time series,
+robot experience, logged interactions, and replay buffers. A common response
+is to replace the nominal sample size $N$ by a scalar effective sample size.
+This is appropriate when every feature direction shares a common correlation
+profile. It becomes inadequate when weak spectral directions are also the
+slowest directions to change. In that case there is no single rate at which
+new information arrives.
+
+This paper studies the following question:
+
+\begin{quote}
+\emph{When does sample dependence change a scaling exponent rather than only
+a constant?}
+\end{quote}
+
+We answer it in an exactly solvable persistent regression model. Mode $j$
+has test probability $\lambda_j$ but persists for time $\tau_j$. To preserve
+the same one-time marginal distribution, a new block selects mode $j$ with
+probability
+\begin{equation}
+q_j
+=\frac{\lambda_j/\tau_j}{\sum_{\ell\ge1}\lambda_\ell/\tau_\ell}.
+\label{eq:innovation-law-intro}
+\end{equation}
+Thus the marginal spectrum is $\lambda$, whereas the spectrum of
+statistically new arrivals is $q$. Under power laws, $q_j\asymp
+j^{-(a+r)}$, producing the learnable resolution
+\begin{equation}
+J_B\asymp B^{1/(a+r)}.
+\label{eq:resolution-intro}
+\end{equation}
+The target energy beyond $J_B$ is
+$\sum_{j>J_B}s_j\asymp B^{-(b-1)/(a+r)}$. This is the central mechanism.
+
+Our contributions are:
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
+    \item We define spectral renewal regression, in which different
+    persistence profiles have the same one-time covariance but different
+    innovation spectra.
+    \item We derive an exact finite-$B$ risk decomposition into model
+    approximation, unseen-mode bias, and label-noise variance.
+    \item Under power-law covariance, persistence, and source conditions, we
+    prove matching rates in model size and data. In the noiseless case we
+    prove an exact minimax identity, showing that the changed exponent is an
+    information limitation rather than an artifact of a particular optimizer.
+    \item We transfer the noiseless rate from a fixed number of innovations
+    to a fixed raw trajectory length under finite-variance dwell times.
+    \item We construct stationary semi-Markov and reversible Markov processes
+    with the required mode-wise autocorrelation, derive an exact scaling
+    function at the model--data frontier, and verify all predicted slopes with
+    lightweight reproducible experiments.
+\end{enumerate}
+
+The scope is deliberate. Our theorem concerns persistent spectral sampling;
+it does not assert that every dense Gaussian autoregression has the same
+exponent. The model is useful because it cleanly separates marginal spectral
+mass from the rate at which independent spectral information appears.
+

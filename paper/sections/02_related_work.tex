@@ -1,0 +1,43 @@
+\section{Related Work}
+
+\paragraph{Scaling laws and spectral learning curves.}
+Empirical neural scaling laws were documented by
+\cite{kaplan2020scaling} and refined for compute-optimal training by
+\cite{hoffmann2022training}. Spectral theories explain learning curves through
+resolution of covariance or kernel eigenmodes
+\cite{bordelon2020spectrum,bahri2024explaining}. Solvable random-feature
+models connect power-law data structure to model- and data-scaling exponents
+\cite{maloney2022solvable}, while feature learning can alter those exponents
+outside the kernel regime \cite{bordelon2024feature}.
+
+Our closest starting point is the infinite-dimensional sketched linear model
+of \cite{lin2024scaling}, which proves a two-resource law for one-pass SGD on
+i.i.d. data. \cite{lin2025reuse} adds a source exponent and shows how
+multi-pass optimization can improve the iteration term when data are reused.
+We instead keep the marginal task fixed and modify the temporal arrival
+process. Reusing a persistent block cannot reveal a mode that has not arrived;
+this creates an innovation-limited spectral cutoff.
+
+\paragraph{Regression with dependent samples.}
+Least squares under Markovian sampling is known to depend on mixing time, and
+worst-case minimax rates can be attained by data dropping; structured chains
+can benefit from experience replay \cite{nagaraj2020markovian}. Finite-time
+SGD analyses and recent single-trajectory lower bounds likewise quantify
+Markov dependence through global chain parameters
+\cite{doan2020finite,sun2025single}. Recent high-dimensional ridge theory
+allows correlated Gaussian examples and derives sharp risk and
+cross-validation formulas \cite{atanasov2024correlated}. Its
+matrix-Gaussian model has separable covariance
+$\E[X_{ti}X_{sj}]=K_{ts}\Sigma_{ij}$: every feature direction inherits the
+same sample-correlation matrix. Our construction is nonseparable. Mode $j$
+has its own correlation time $\tau_j$, and the alignment between
+$\lambda_j$ and $\tau_j$ is precisely what changes the exponent.
+
+\paragraph{Infinite occupancy.}
+At innovation times, the problem is an infinite-urn scheme with frequencies
+$q_j$. Missing-mass and occupancy asymptotics under regular variation are
+well studied \cite{gnedin2007occupancy,benhamou2017concentration}. Our risk is
+a \emph{target-weighted} missing mass: unseen mode $j$ costs $s_j$, which may
+have a different exponent from $q_j$. We use this weighted structure to derive
+the model--data scaling law and minimax regression interpretation.
+
