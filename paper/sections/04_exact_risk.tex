@@ -1,0 +1,114 @@
+\section{Exact Risk and Scaling Law}
+
+For $K\sim\mathrm{Binomial}(B,q)$ define
+\begin{equation}
+h_B(q):=\E\left[\frac{\1\{K>0\}}{K}\right].
+\label{eq:h-def}
+\end{equation}
+
+\begin{theorem}[Exact finite-block risk]
+\label{thm:exact-risk}
+For every $B,M\ge1$ and every target with
+$\sum_j s_j<\infty$, the estimator in Equation~\eqref{eq:estimator} satisfies
+\begin{align}
+\E\risk(\widehat\theta,\theta)
+={}&\underbrace{\sum_{j>M}s_j}_{\text{model approximation}}
++\underbrace{\sum_{j\le M}s_j(1-q_j)^B}_{\text{unseen-mode bias}}
+\nonumber\\
+&+\underbrace{\sigma^2\sum_{j\le M}
+\frac{\lambda_j}{\tau_j}h_B(q_j)}_{\text{label-noise variance}}.
+\label{eq:exact-risk}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+If $K_j=0$, coordinate $j\le M$ is estimated by zero and contributes
+$s_j$. If $K_j=k>0$, the signed average is unbiased and has conditional
+variance $\sigma^2/(\tau_jk)$. Since $K_j\sim\mathrm{Binomial}(B,q_j)$,
+averaging these cases and adding the unavoidable $j>M$ tail gives
+Equation~\eqref{eq:exact-risk}.
+\end{proof}
+
+The variance term is governed by a simple reciprocal-count estimate.
+
+\begin{lemma}[Reciprocal binomial count]
+\label{lem:binomial}
+There are universal constants $0<c<C<\infty$ such that, for all $B\ge1$ and
+$q\in(0,1]$,
+\begin{equation}
+c\min\{Bq^2,B^{-1}\}
+\le qh_B(q)
+\le C\min\{Bq^2,B^{-1}\}.
+\label{eq:binomial-bound}
+\end{equation}
+\end{lemma}
+
+The proof is given in the technical supplement. We now state the principal scaling
+law. The notation $u_j\asympconst v_j$ means that their ratio is bounded above
+and below by positive constants independent of $j$, $B$, and $M$.
+
+\begin{theorem}[Persistent spectral scaling law]
+\label{thm:scaling}
+Assume
+\begin{equation}
+\lambda_j\asympconst j^{-a},
+\qquad
+\tau_j\asympconst j^r,
+\qquad
+s_j\asympconst j^{-b},
+\label{eq:power-laws}
+\end{equation}
+where $a>1$, $r\ge0$, and $b>1$. Put $p=a+r$. Then, uniformly for
+$B,M\ge2$,
+\begin{equation}
+\boxed{
+\E\risk(\widehat\theta,\theta)
+\asympconst
+M^{-(b-1)}
++B^{-(b-1)/p}
++\sigma^2\frac{\min\{M,B^{1/p}\}}{B}.}
+\label{eq:main-scaling}
+\end{equation}
+The hidden constants depend only on the comparison constants in
+Equation~\eqref{eq:power-laws} and on $a,b,r$.
+\end{theorem}
+
+\paragraph{Interpretation.}
+The innovation probabilities satisfy $q_j\asymp j^{-p}$. A mode has a
+constant probability of appearing once $Bq_j\gtrsim1$, giving the spectral
+resolution
+\begin{equation}
+J_B\asymp B^{1/p}=B^{1/(a+r)}.
+\label{eq:JB}
+\end{equation}
+The first two terms in Equation~\eqref{eq:main-scaling} are equivalently
+$\Theta(\min\{M,J_B\}^{-(b-1)})$. The third term counts the number of
+well-observed modes, up to the same resolution, divided by $B$.
+
+\begin{corollary}[When persistence changes the exponent]
+\label{cor:exponent}
+In the noiseless case, or for fixed $\sigma^2=O(1)$ in the hard-target regime
+$1<b<a+r$ where the bias term dominates the variance term,
+\begin{equation}
+\E\risk(\widehat\theta,\theta)
+\asympconst M^{-(b-1)}+B^{-(b-1)/(a+r)}.
+\label{eq:clean-law}
+\end{equation}
+Uniform persistence has $r=0$ and preserves the i.i.d. exponent
+$(b-1)/a$. If weaker modes persist longer with $r>0$, the data exponent becomes
+$(b-1)/(a+r)$.
+\end{corollary}
+
+\begin{corollary}[Noise regimes and model choice]
+\label{cor:model-choice}
+Let $\sigma>0$ be fixed. If $b<a+r$, taking
+$M\asymp B^{1/(a+r)}$ achieves risk
+$\Theta(B^{-(b-1)/(a+r)})$. If $b>a+r$, the rate-optimal model size is
+\begin{equation}
+M_\star\asymp(B/\sigma^2)^{1/b},
+\label{eq:optimal-M}
+\end{equation}
+and the resulting dominant risk is
+$\Theta((\sigma^2/B)^{(b-1)/b})$.
+\end{corollary}
+
