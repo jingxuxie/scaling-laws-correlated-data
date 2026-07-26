@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-      - agent/submission-ready-final
+      - "agent/**"
     paths:
       - "paper/*.tex"
       - "paper/**/*.tex"
@@ -89,6 +89,7 @@ jobs:
             paper/reproducibility_checklist.tex \
             paper/figures/theory_summary.pdf \
             paper/figures/validation_summary.pdf \
+            paper/figures/mechanism_planning.pdf \
             results/real_sequential \
             results/final_audit/build_report.json
           if ! git diff --cached --quiet; then
