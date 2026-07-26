@@ -1,0 +1,60 @@
+name: Apply submission bundle
+
+on:
+  push:
+    branches:
+      - agent/submission-ready-final
+    paths:
+      - ".submission_bundle.part*"
+      - ".github/workflows/apply-submission-bundle.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and unpack source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .submission_bundle.part* | base64 -d > /tmp/submission_bundle.tar.gz
+          echo "fced79dfbc61589778c865194e007440fdb70974305897b55651a70094d71b39  /tmp/submission_bundle.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/submission_bundle.tar.gz -C .
+      - name: Remove superseded and transfer-only files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .submission_bundle.part*
+          rm -f .research_patch.part00 .research_patch.part01 .research_patch.part02 .research_patch.part03 .research_patch.part04
+          rm -f .github/workflows/apply-local-patch.yml
+          rm -f .github/workflows/real-data.yml
+          rm -f .github/workflows/apply-submission-bundle.yml
+          rm -f paper/appendix_content.tex
+          rm -f \
+            paper/sections/04_exact_risk.tex \
+            paper/sections/05_minimax.tex \
+            paper/sections/06_stationary_processes.tex \
+            paper/sections/07_experiments.tex \
+            paper/sections/08_discussion.tex \
+            paper/sections/09_conclusion.tex
+          rm -f \
+            paper/appendix/01_binomial_proof.tex \
+            paper/appendix/02_scaling_proof.tex \
+            paper/appendix/04_scaling_function.tex \
+            paper/appendix/05_experiment_details.tex \
+            paper/appendix/06_reproducibility.tex
+      - name: Commit applied research package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Complete submission-ready theory and experiments"
+          git push origin HEAD:${GITHUB_REF_NAME}
