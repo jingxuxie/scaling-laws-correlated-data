@@ -1,51 +1,31 @@
-\documentclass[letterpaper]{article}
-
-\newif\ifofficialformat
-\IfFileExists{aaai2027.sty}{%
-  \officialformattrue
-  \usepackage[submission]{aaai2027}
-}{%
-  \officialformatfalse
-  \usepackage[margin=1in]{geometry}
-  \usepackage{newtxtext}
-}
-
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{newtxtext}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage{booktabs}
-\usepackage{graphicx}
-\usepackage{microtype}
-\usepackage{url}
-\usepackage{xcolor}
-\usepackage{enumitem}
-\usepackage{multirow}
-\usepackage{xr}
-\externaldocument{main}
-
+\usepackage{natbib}
+\usepackage{booktabs,graphicx,microtype,url}
 \graphicspath{{figures/}}
-
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{remark}[theorem]{Remark}
-
-\newcommand{\R}{\mathbb{R}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Prob}{\mathbb{P}}
 \newcommand{\risk}{\mathcal{R}}
 \newcommand{\1}{\mathbf{1}}
 \newcommand{\asympconst}{\mathrel{\asymp}}
-\newcommand{\cO}{\mathcal{O}}
-\newcommand{\eps}{\varepsilon}
-
-\title{Supplementary Material:\\
-Beyond Effective Sample Size: Spectral Scaling Laws for Persistent Data Streams}
+\title{Technical Supplement: Beyond Effective Sample Size}
 \author{Anonymous submission}
-
+\date{}
 \begin{document}
 \maketitle
-\appendix
-\input{appendix_content}
+\tableofcontents
+\input{appendix/01_block_proofs.tex}
+\input{appendix/02_minimax_scaling_function.tex}
+\input{appendix/03_raw_horizon_proof.tex}
+\input{appendix/04_noisy_raw_proof.tex}
+\input{appendix/05_representation_markov.tex}
+\input{appendix/06_experiment_details.tex}
+\bibliographystyle{plainnat}
+\bibliography{references}
 \end{document}

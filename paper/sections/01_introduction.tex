@@ -1,72 +1,61 @@
 \section{Introduction}
 
-Scaling laws summarize how predictive loss decreases as models, data, and
-compute grow. They have become an empirical planning tool for large language
-models \cite{kaplan2020scaling,hoffmann2022training} and a theoretical target
-for random features, kernels, and linear regression
-\cite{bahri2024explaining,maloney2022solvable,bordelon2020spectrum,lin2024scaling}.
-A recurring spectral picture is that larger datasets resolve progressively
-weaker eigenmodes of the data distribution. With covariance spectrum
-$\lambda_j\asymp j^{-a}$ and target energy $s_j\asymp j^{-b}$, the largest
-learnable index is typically a power of the sample size; summing the unresolved
-target tail then produces a power-law learning curve.
+Scaling laws turn small experiments into forecasts of how loss changes with
+model size, data, and compute. They are now central to resource planning in
+large-scale learning \cite{kaplan2020scaling,hoffmann2022training}, while
+spectral theories explain power laws through the progressive resolution of
+weaker covariance or kernel modes
+\cite{bordelon2020spectrum,bahri2024explaining,lin2024scaling}. Nearly all such
+theories begin with independent examples. Real datasets, however, are often
+contiguous trajectories: robot logs, sensor streams, financial histories, and
+replay buffers.
 
-Most scaling-law theories assume independent samples. Yet many practically
-important datasets are trajectories: financial and physical time series,
-robot experience, logged interactions, and replay buffers. A common response
-is to replace the nominal sample size $N$ by a scalar effective sample size.
-This is appropriate when every feature direction shares a common correlation
-profile. It becomes inadequate when weak spectral directions are also the
-slowest directions to change. In that case there is no single rate at which
-new information arrives.
-
-This paper studies the following question:
-
+A standard correction replaces the nominal sample count by a scalar effective
+sample size. This is sensible when every feature direction shares one temporal
+kernel. It is incomplete when the weak directions that dominate late-stage
+learning are also the slowest to refresh. Then information arrives at a
+\emph{spectrum} of rates. We ask:
 \begin{quote}
-\emph{When does sample dependence change a scaling exponent rather than only
-a constant?}
+\emph{When does dependence change a scaling exponent, rather than only a
+constant?}
 \end{quote}
 
-We answer it in an exactly solvable persistent regression model. Mode $j$
-has test probability $\lambda_j$ but persists for time $\tau_j$. To preserve
-the same one-time marginal distribution, a new block selects mode $j$ with
-probability
+We isolate the mechanism in an exactly solvable model. Mode $j$ occupies a
+fraction $\lambda_j$ of raw time but lasts $\tau_j$ steps whenever it appears.
+Preserving the same one-time covariance forces new blocks to choose mode $j$
+with probability
 \begin{equation}
-q_j
-=\frac{\lambda_j/\tau_j}{\sum_{\ell\ge1}\lambda_\ell/\tau_\ell}.
-\label{eq:innovation-law-intro}
+q_j=\frac{\lambda_j/\tau_j}{\sum_\ell\lambda_\ell/\tau_\ell}.
+\label{eq:intro-q}
 \end{equation}
-Thus the marginal spectrum is $\lambda$, whereas the spectrum of
-statistically new arrivals is $q$. Under power laws, $q_j\asymp
-j^{-(a+r)}$, producing the learnable resolution
-\begin{equation}
-J_B\asymp B^{1/(a+r)}.
-\label{eq:resolution-intro}
-\end{equation}
-The target energy beyond $J_B$ is
-$\sum_{j>J_B}s_j\asymp B^{-(b-1)/(a+r)}$. This is the central mechanism.
+Thus the marginal spectrum is $\lambda$, whereas the \emph{innovation
+spectrum} is $q$. If $\lambda_j\asymp j^{-a}$ and
+$\tau_j\asymp j^r$, then $q_j\asymp j^{-(a+r)}$. After $B$ innovations, the
+largest mode seen with constant probability is
+$J_B\asymp B^{1/(a+r)}$; unresolved target energy
+$s_j\asymp j^{-b}$ therefore contributes
+$B^{-(b-1)/(a+r)}$.
 
 Our contributions are:
-\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
-    \item We define spectral renewal regression, in which different
-    persistence profiles have the same one-time covariance but different
-    innovation spectra.
-    \item We derive an exact finite-$B$ risk decomposition into model
-    approximation, unseen-mode bias, and label-noise variance.
-    \item Under power-law covariance, persistence, and source conditions, we
-    prove matching rates in model size and data. In the noiseless case we
-    prove an exact minimax identity, showing that the changed exponent is an
-    information limitation rather than an artifact of a particular optimizer.
-    \item We transfer the noiseless rate from a fixed number of innovations
-    to a fixed raw trajectory length under finite-variance dwell times.
-    \item We construct stationary semi-Markov and reversible Markov processes
-    with the required mode-wise autocorrelation, derive an exact scaling
-    function at the model--data frontier, and verify all predicted slopes with
-    lightweight reproducible experiments.
+\begin{enumerate}
+\item We define \emph{spectral renewal regression} and derive an exact
+finite-sample bias--variance identity. Under power laws, it yields matching
+model, innovation, and noise terms.
+\item We prove an exact noiseless minimax equality: no optimizer or data-reuse
+strategy can identify the sign of a mode that never arrived.
+\item We pass from innovations to exactly $N$ raw examples without a
+finite-variance assumption. Boundary initialization retains the innovation
+exponent for every $r\ge0$, while equilibrium initialization can enter a new
+inspection-paradox phase.
+\item Using the von Bahr--Esseen inequality, we obtain a noisy raw-horizon rate
+under fractional, rather than second, dwell moments. This covers substantial
+infinite-variance regimes.
+\item We show that the theorem is invariant under known well-conditioned dense
+representations. Synthetic and real-data tests verify the predicted regimes
+and, importantly, show that dense autoregressive correlation without an
+innovation bottleneck need not obey the $a+r$ law.
 \end{enumerate}
 
-The scope is deliberate. Our theorem concerns persistent spectral sampling;
-it does not assert that every dense Gaussian autoregression has the same
-exponent. The model is useful because it cleanly separates marginal spectral
-mass from the rate at which independent spectral information appears.
-
+The last point delimits the claim: autocorrelation by itself is not enough. The
+exponent changes when dependence throttles the arrival of new predictive
+spectral information.

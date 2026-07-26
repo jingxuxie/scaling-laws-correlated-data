@@ -1,0 +1,28 @@
+\section{Discussion and Limitations}
+
+\paragraph{What is established.}
+Two streams can share the same one-time covariance and the same number of raw
+observations yet have different exponents. The decisive object in our model is
+the innovation spectrum $\lambda_j/\tau_j$. Uniform persistence produces a
+horizontal shift; persistence increasing toward weak modes moves the
+model--data frontier. Heavy stationary dwell times add a second, explicitly
+quantified phase through residual life.
+
+\paragraph{What is not claimed.}
+The theorem does not state that every dependent Gaussian design has exponent
+$(b-1)/(a+r)$. The dense AR control shows why: when every sample contains every
+mode, temporal correlation need not create an occupancy bottleneck. General
+processes may combine innovation coverage, sample-covariance concentration,
+and optimization effects. Characterizing that decomposition for arbitrary
+noncommuting space--time operators remains open. Representation invariance also
+assumes the dense map is known; the ambient minimum-norm result is empirical.
+Finally, the real-data proxy estimates $\tau_j$ after PCA and ignores
+uncertainty in spectral alignment. A broader benchmark is needed before its
+improvement can be treated as universal.
+
+\paragraph{Practical implication.}
+A data audit should measure not only variance in direction $j$, but how often
+that direction is refreshed. If late spectral directions arrive in long
+bursts, more contiguous logging may be less valuable than increasing temporal,
+environmental, or population diversity. A global effective sample size can
+hide precisely this allocation decision.

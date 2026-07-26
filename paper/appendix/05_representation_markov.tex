@@ -1,0 +1,94 @@
+\section{Dense representation and stationary Markov realization}
+
+\subsection{Representation invariance}
+Let $V\in\mathbb R^{D\times D}$ be invertible with rows $v_j^\top$. The
+observed covariate is $X=Sv_J$, the latent label is $S\theta_J$, and the ambient
+teacher is $w^\star=V^{-1}\theta$.
+
+\begin{proposition}
+For $\widehat w=V^{-1}\widehat\theta$,
+\[
+\E\langle X,\widehat w-w^\star\rangle^2
+=\sum_{j=1}^D\lambda_j(\widehat\theta_j-\theta_j)^2.
+\]
+If $\lambda_1\ge\cdots\ge\lambda_D$ and
+$mI\preceq VV^\top\preceq LI$, then for
+$\Sigma=V^\top\Lambda V$ and $\Lambda=\operatorname{diag}(\lambda)$,
+\[
+m\lambda_j\le\lambda_j(\Sigma)\le L\lambda_j
+\quad (j=1,\ldots,D),
+\]
+where eigenvalues are ordered decreasingly.
+\end{proposition}
+
+\begin{proof}
+Since $v_j^\top\widehat w=(V\widehat w)_j=\widehat\theta_j$, the prediction
+identity is immediate. The nonzero eigenvalues of $V^\top\Lambda V$ equal
+those of $\Lambda^{1/2}VV^\top\Lambda^{1/2}$. The assumed operator inequality
+implies
+\[
+m\Lambda\preceq\Lambda^{1/2}VV^\top\Lambda^{1/2}\preceq L\Lambda.
+\]
+Eigenvalue monotonicity under Loewner order gives the claim.
+\end{proof}
+
+\subsection{Why dense autoregression is a negative control}
+Consider the finite-dimensional Gaussian process
+\[
+x_{t,j}=\rho_jx_{t-1,j}
++\sqrt{1-\rho_j^2}\sqrt{\lambda_j}z_{t,j},
+\qquad |\rho_j|<1,
+\]
+with independent standard Gaussian innovations.
+
+\begin{proposition}[Finite-dimensional exact recovery]
+For every $N\ge D$, the $N\times D$ design matrix has full column rank almost
+surely. Consequently, noiseless least squares recovers every teacher exactly,
+regardless of the mode-dependent autocorrelation times.
+\end{proposition}
+
+\begin{proof}
+The stacked entries of the design matrix have a nonsingular joint Gaussian
+law: the map from the stationary initial state and subsequent innovations to
+the trajectory is invertible, and every innovation variance is positive.
+Hence the design has a density with respect to Lebesgue measure on
+$\mathbb R^{N\times D}$. Rank-deficient matrices form an algebraic set of
+Lebesgue measure zero when $N\ge D$. Full column rank makes the noiseless least
+squares solution unique and equal to the teacher.
+\end{proof}
+
+This proposition does not describe an infinite-dimensional joint limit. It
+serves only to show that mode-wise correlation, without restricted innovation
+coverage, cannot universally force the renewal exponent.
+
+\subsection{A reversible nonseparable Markov chain}
+Consider states $(j,s)$, $s\in\{-1,1\}$, with transition kernel
+\[
+P((j,s),(k,t))=
+(1-\tau_j^{-1})\1\{(j,s)=(k,t)\}
++\tau_j^{-1}\frac{q_k}{2}.
+\]
+
+\begin{proposition}
+The chain is reversible with stationary law $\pi_{j,s}=\lambda_j/2$. For
+$X_t=S_te_{J_t}$,
+\[
+\E[X_tX_{t+\ell}^\top]
+=\sum_j\lambda_j(1-\tau_j^{-1})^\ell e_je_j^\top.
+\]
+Unless all $\tau_j$ are equal, this covariance is not a scalar time kernel
+times the spatial covariance.
+\end{proposition}
+
+\begin{proof}
+For distinct states,
+\[
+\pi_{j,s}P((j,s),(k,t))
+=\frac{\lambda_jq_k}{4\tau_j}
+=\frac{Zq_jq_k}{4},
+\]
+which is symmetric; diagonal transitions are immediate. Conditional on
+$J_t=j$, the only contribution correlated with $X_t$ is the event of no
+refresh during $\ell$ steps, with probability
+$(1-\tau_j^{-1})^\ell$. Any refresh resamples a mean-zero sign.
+\end{proof}

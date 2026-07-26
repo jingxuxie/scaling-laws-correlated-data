@@ -1,154 +1,96 @@
-\subsection{Proof of Theorem~\ref{thm:raw-horizon}}
-\label{app:raw-horizon}
+\section{Fixed raw horizons and equilibrium initialization}
 
-We first analyze a trajectory started at a renewal boundary.  For mode $j$,
-let
-\begin{equation}
-G_j:=\min\{k\ge1:J_k=j\},
-\qquad
-H_j:=\sum_{k=1}^{G_j-1}\tau_{J_k},
-\label{eq:first-hit-time}
-\end{equation}
-so that $H_j$ is the raw time at which the first block of mode $j$ begins.
-Mode $j$ is unseen in the first $N$ raw observations exactly when $H_j\ge N$.
-Writing
-\begin{equation}
-u_j(N):=\Prob(H_j\ge N),
-\label{eq:unseen-raw}
-\end{equation}
-we therefore have the exact identity
-\begin{equation}
-\E\risk(\widehat\theta^{(N)},\theta)
-=\sum_{j>M}s_j+\sum_{j\le M}s_j u_j(N).
-\label{eq:raw-exact-missing}
-\end{equation}
+Assume integer durations $\tau_j\ge1$. Start at a renewal boundary and let
+$J_1,J_2,\ldots$ be i.i.d. from $q$. For mode $j$, define
+\[
+G_j=\min\{k\ge1:J_k=j\},\qquad
+H_j=\sum_{k=1}^{G_j-1}\tau_{J_k}.
+\]
+Thus $H_j$ is the raw start time of the first $j$-block, and mode $j$ is unseen
+in the first $N$ observations iff $H_j\ge N$.
 
-The key observation is that $u_j(N)$ can be controlled mode by mode without
-concentrating the total renewal count.  Conditional on a failure
-$J_k\ne j$, the mean dwell time is
-\begin{equation}
-\mu_{-j}
-=\frac{\mu-q_j\tau_j}{1-q_j}.
-\label{eq:failure-duration-mean}
-\end{equation}
-The number $G_j-1$ of failures before the first success is geometric with
-mean $(1-q_j)/q_j$, and the failure modes are i.i.d. from the conditional law.
-Consequently,
-\begin{equation}
-\E H_j
-=\frac{1-q_j}{q_j}\mu_{-j}
-=\frac{\mu}{q_j}-\tau_j
-\le \frac{\mu}{q_j}.
-\label{eq:hitting-time-mean}
-\end{equation}
+Conditional on a failure $J_k\ne j$, the mean duration is
+$\mu_{-j}=(\mu-q_j\tau_j)/(1-q_j)$. Since $G_j-1$ is geometric with mean
+$(1-q_j)/q_j$,
+\[
+\E H_j=\frac{1-q_j}{q_j}\mu_{-j}
+=\frac{\mu}{q_j}-\tau_j\le\frac{\mu}{q_j}.
+\]
 Markov's inequality gives
 \begin{equation}
- u_j(N)\le \min\left\{1,\frac{\mu}{Nq_j}\right\}.
-\label{eq:hitting-upper}
+\Prob(H_j\ge N)\le\min\{1,\mu/(Nq_j)\}.
+\label{eq:supp-hit-upper}
 \end{equation}
-For the reverse direction, every dwell time is at least one.  If the first
-$N$ innovation modes all avoid $j$, then the first $j$-block cannot start
-before raw time $N$.  Hence
+Conversely, if the first $N$ innovation modes avoid $j$, at least $N$ raw
+observations elapse before a $j$-block can start, so
 \begin{equation}
- u_j(N)\ge (1-q_j)^N.
-\label{eq:hitting-lower}
+\Prob(H_j\ge N)\ge(1-q_j)^N.
+\label{eq:supp-hit-lower}
 \end{equation}
-These two elementary inequalities are sufficient for the sharp rate.
 
-Put $p=a+r$ and $J_N=N^{1/p}$.  Since $q_j\asympconst j^{-p}$ and
-$s_j\asympconst j^{-b}$, Equation~\eqref{eq:hitting-upper} yields
-\begin{equation}
-\sum_{j\le M}s_j u_j(N)
-\lesssim
-\sum_{j\le M}j^{-b}\min\{1,j^p/N\}.
-\label{eq:raw-upper-sum}
-\end{equation}
-If $M\le J_N$, the right-hand side is at most
-\begin{equation}
-\frac{C}{N}\sum_{j\le M}j^{p-b}
-\lesssim \frac{M^{p-b+1}}{N}
-\le C M^{1-b},
-\label{eq:raw-upper-small-M}
-\end{equation}
-where $b<p+1$ is used in the sum.  If $M>J_N$, splitting at $J_N$ gives
-\begin{align}
-\sum_{j\le M}s_j u_j(N)
-&\lesssim
-\frac1N\sum_{j\le J_N}j^{p-b}
-+\sum_{j>J_N}j^{-b}
-\nonumber\\
-&\lesssim N^{-(b-1)/p}.
-\label{eq:raw-upper-large-M}
-\end{align}
-Together with $\sum_{j>M}s_j\asympconst M^{1-b}$, this proves the desired
-upper bound.
+\begin{theorem}[Boundary-start raw rate]
+Let $p=a+r$ and assume $1<b<p+1$. Then
+\[
+\E\risk(\widehat\theta^{(N)},\theta)
+\asympconst M^{1-b}+N^{-(b-1)/p}.
+\]
+\end{theorem}
 
-For the lower bound, the approximation term always contributes
-$cM^{1-b}$.  If $M\le C_0J_N$, this term is also at least a constant multiple
-of $N^{-(b-1)/p}$.  Otherwise choose $C_0$ large enough that
-$q_j\le(2N)^{-1}$ throughout an annulus
-$j\in[C_0J_N,2C_0J_N]\subseteq[1,M]$.  Equation~\eqref{eq:hitting-lower}
-then gives
-\begin{equation}
- u_j(N)\ge\left(1-\frac1{2N}\right)^N\ge c,
-\label{eq:annulus-unseen}
-\end{equation}
-and summing over the annulus yields
-\begin{equation}
-\sum_{j\le M}s_j u_j(N)
-\gtrsim J_N^{1-b}
-=N^{-(b-1)/p}.
-\label{eq:raw-annulus-lower}
-\end{equation}
-This proves Equation~\eqref{eq:raw-horizon-rate} for every $r\ge0$; no
-moment beyond $\E\tau_J=\mu<\infty$ is required.
+\begin{proof}
+The exact noiseless missing-mode identity is
+\[
+\E\risk=\sum_{j>M}s_j+\sum_{j\le M}s_j\Prob(H_j\ge N).
+\]
+Using Equation~\eqref{eq:supp-hit-upper}, the second term is at most
+\[
+C\sum_{j\le M}j^{-b}\min\{1,j^p/N\}.
+\]
+Put $J=N^{1/p}$. If $M\le J$, this is bounded by
+$N^{-1}\sum_{j\le M}j^{p-b}\lesssim M^{p-b+1}/N\le M^{1-b}$.
+If $M>J$, splitting at $J$ gives $CN^{-(b-1)/p}$. Add the approximation tail.
 
-\paragraph{Equilibrium initialization.}
-Let $J_0$ denote the mode occupying time zero and let $R$ be its forward
-recurrence time.  The equilibrium law is
-\begin{equation}
-\Prob(J_0=j)=\frac{q_j\tau_j}{\mu}=\lambda_j,
-\label{eq:equilibrium-mode-law}
-\end{equation}
-and, conditional on $J_0=j$, $R$ is uniform on
-$\{1,\ldots,\tau_j\}$.  For $r>0$ this implies
-\begin{align}
-\Prob(R\ge N)
-&=\sum_j\lambda_j
+For the lower bound, the approximation term gives $cM^{1-b}$. Choose a
+sufficiently large constant $A$. If $M\le2AJ$, it also controls $J^{1-b}$.
+If $M>2AJ$, then $[AJ,2AJ]\subseteq[1,M]$ and
+$q_j\le(2N)^{-1}$ throughout this annulus. By
+Equation~\eqref{eq:supp-hit-lower}, each such mode is unseen with constant
+probability, and their total target energy is $cJ^{1-b}$.
+\end{proof}
+
+\subsection{Stationary equilibrium and inspection bias}
+At equilibrium, the initial mode has size-biased law
+$\Prob(J_0=j)=q_j\tau_j/\mu=\lambda_j$. Conditional on $J_0=j$, the forward
+residual $R$ is uniform on $\{1,\ldots,\tau_j\}$. For $r>0$,
+\[
+\Prob(R\ge N)=\sum_j\lambda_j
 \frac{(\tau_j-N+1)_+}{\tau_j}
 \asympconst N^{-(a-1)/r}.
-\label{eq:residual-tail}
-\end{align}
-Indeed, the upper bound follows by summing $\lambda_j$ over
-$j\gtrsim N^{1/r}$, while the lower bound restricts to modes with
-$\tau_j\ge2N$, for which the conditional survival probability is at least
-$1/2$.  If $r=0$, the dwell times are uniformly bounded and the residual term
-vanishes for sufficiently large $N$.
+\]
+The upper bound sums $\lambda_j$ over $j\gtrsim N^{1/r}$; the lower bound
+restricts to $\tau_j\ge2N$, on which the conditional survival probability is
+at least $1/2$.
 
-Let $\delta=(a-1)/r$ when $r>0$.  On the event $R\le N/2$, the future
-trajectory contains at least $N/2$ raw observations from an independent
-renewal boundary, and the initially observed mode can only reduce noiseless
-risk.  On $R>N/2$, risk is bounded by $S_0:=\sum_js_j$.  The boundary result
-therefore gives
-\begin{equation}
+\begin{theorem}[Equilibrium raw rate]
+For $r>0$ and $1<b<a+r+1$,
+\[
 \E\risk(\widehat\theta^{(N)}_{\rm eq},\theta)
-\lesssim M^{1-b}+N^{-(b-1)/p}+\Prob(R>N/2)
-\lesssim M^{1-b}+N^{-(b-1)/p}+N^{-\delta}.
-\label{eq:stationary-upper}
-\end{equation}
+\asympconst M^{1-b}+N^{-(b-1)/(a+r)}+N^{-(a-1)/r}.
+\]
+For $r=0$, the last term is absent.
+\end{theorem}
 
-For a matching innovation lower bound, take the same critical annulus as
-above.  For each mode in it, the event that $J_0\ne j$ and the first $N$
-future innovation modes avoid $j$ has probability
-\begin{equation}
-(1-\lambda_j)(1-q_j)^N\ge c.
-\label{eq:stationary-annulus-event}
-\end{equation}
-At most $N$ future blocks can begin in $N$ raw observations, so this event
-implies that $j$ is unseen.  It contributes
-$cN^{-(b-1)/p}$.  Finally, on $R\ge N$ no renewal occurs during the horizon.
-For all sufficiently large $N$, such an initial mode is not mode one, so mode
-one remains unseen and contributes at least $s_1$.  Equation~\eqref{eq:residual-tail}
-therefore gives a second lower bound $cN^{-\delta}$.  Combining these two
-bounds using $\max\{x,y\}\ge(x+y)/2$, and adding the approximation tail,
-proves Equation~\eqref{eq:stationary-raw-rate}.
+\begin{proof}
+On $R\le N/2$, the trajectory after the first renewal contains at least $N/2$
+raw observations from an independent boundary start; seeing the initial mode
+can only reduce noiseless risk. On $R>N/2$, risk is at most
+$S_0=\sum_js_j$. This gives the upper bound.
+
+For the innovation lower bound, take the critical annulus
+$j\asymp N^{1/(a+r)}$. The event that $J_0\ne j$ and the first $N$ future
+innovation modes avoid $j$ has probability
+$(1-\lambda_j)(1-q_j)^N\ge c$, and implies that $j$ is unseen because at most
+$N$ blocks can start. Summing gives $cN^{-(b-1)/(a+r)}$. On $R\ge N$, no
+renewal occurs. For large $N$ the initial mode must differ from mode one, so
+mode one remains unseen and contributes $s_1\Prob(R\ge N)$. Combine the two
+lower bounds and the approximation tail.
+\end{proof}

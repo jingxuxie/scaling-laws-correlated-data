@@ -1,0 +1,67 @@
+\section{Experimental and reproducibility details}
+
+\subsection{Synthetic calculations}
+The exact-risk script truncates at a large $M$ and adds the Hurwitz-zeta tail,
+so no finite-dimensional tail is silently discarded. Slopes are fit only on
+the largest scales and local slopes are retained. The independent block Monte
+Carlo sampler draws directly from the infinite Zipf innovation law. The
+raw-horizon sampler concatenates deterministic integer dwell blocks and stops
+at exactly $N$ observations. The heavy-tail experiment uses
+$(a,b,r)=(2,5.5,3)$, where the block duration has infinite variance and the
+stationary residual exponent is $(a-1)/r=1/3$.
+
+The noisy experiment evaluates
+$h_B(q)=\E[\1\{K>0\}/K]$ by Gauss--Legendre quadrature using
+\[
+h_B(q)=\int_0^1\frac{(1-q+qt)^B-(1-q)^B}{t}\,dt,
+\]
+and compares the coverage-limited choice $M\asymp B^{1/(a+r)}$ with direct
+minimization over $M$.
+
+\subsection{Dense representation}
+The dense test uses $D=512$ modes. A Haar-like orthogonal dictionary checks the
+exact change-of-basis identity. The harder dictionary is a row-normalized
+mixture of the orthogonal matrix and an i.i.d. Gaussian perturbation. Its
+measured condition number is 4.67 and maximum normalized row inner product is
+0.13. The learner is the ambient minimum-norm interpolant on seen mode
+equations; it is not given the latent decoder. Results average 120 datasets per
+scale.
+
+The dense Gaussian AR negative control has the same marginal diagonal spectrum
+but observes all coordinates at every time:
+\[
+x_{t,j}=\rho_jx_{t-1,j}
++\sqrt{1-\rho_j^2}\sqrt{\lambda_j}z_{t,j},
+\qquad \rho_j=e^{-1/j^r}.
+\]
+We fit the noiseless batch minimum-norm predictor and evaluate population risk
+under $\operatorname{diag}(\lambda)$. Forty trials are used for each
+$N\in\{16,24,36,54,80,120,176\}$ at dimension 256. This control is intended
+to reject an overgeneralized theorem, not to establish an alternative
+asymptotic law.
+
+\subsection{Appliance-energy diagnostic}
+We use the chronological appliance-energy measurements of
+\citet{candanedo2017appliances}, sampled every ten minutes. After removing two
+random surrogate columns, we add calendar features, six physical-feature and
+target lags (10 minutes through one day), standardize using the chronological
+training split, and fit PCA followed by ridge regression. Ridge strength is
+selected on the final 20\% of the training period. Learning curves average 12
+randomly located contiguous windows and 12 random subsets at each size. The
+last 20\% of time is always held out for testing.
+
+For PCA scores $z_{t,j}$, integrated autocorrelation times use Geyer's initial
+positive sequence, truncated at two days. Target energy is
+$\widehat s_j\propto\widehat\lambda_j\widehat\theta_j^2$. Both spectral
+proxies fit exactly two nuisance parameters--a global amplitude and rate--on
+$N\le1024$ and are evaluated without refitting on $N\ge2048$. The random-subset
+comparison is a falsification control: a genuinely temporal correction should
+not necessarily improve data whose order has been destroyed.
+
+\subsection{Reproduction}
+All synthetic experiments require only NumPy, SciPy, Matplotlib, and
+scikit-learn. The default synthetic suite uses $O(D^2)$ memory only for the
+dense dictionary and runs without a GPU. Commands, exact seeds, unit tests,
+CSV tables, JSON summaries, and figure-generation scripts are included in the
+repository. The real-data workflow downloads the public source file, records
+its URL, and uploads all outputs as a CI artifact.

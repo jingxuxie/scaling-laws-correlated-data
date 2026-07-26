@@ -1,0 +1,123 @@
+\section{Finite-block risk and scaling}
+
+We restate the setup. The test mass, dwell weight, innovation mass, and target
+energy are $\lambda_j$, $\tau_j$, $q_j=(\lambda_j/\tau_j)/Z$, and
+$s_j=\lambda_j\theta_j^2$, where $Z=\sum_j\lambda_j/\tau_j$. The number of
+blocks in mode $j$ is $K_j\sim\mathrm{Binomial}(B,q_j)$. Conditional on
+$K_j=k>0$, the coordinate average is unbiased and has variance
+$\sigma^2/(\tau_jk)$; when $K_j=0$ it is zero.
+
+\begin{theorem}[Exact risk]
+For every $B,M\ge1$,
+\[
+\E\risk=\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B
++\sigma^2\sum_{j\le M}\frac{\lambda_j}{\tau_j}
+\E\left[\frac{\1\{K_j>0\}}{K_j}\right].
+\]
+\end{theorem}
+
+\begin{proof}
+Condition on $K_j$. If $j>M$ the model output is zero and the contribution is
+$s_j$. If $j\le M$ and $K_j=0$, the same contribution occurs with probability
+$(1-q_j)^B$. If $K_j=k>0$, independence of the label noises gives prediction
+variance $\lambda_j\sigma^2/(\tau_jk)$. Summing completes the proof.
+\end{proof}
+
+\begin{lemma}[Reciprocal binomial count]
+Let $K\sim\mathrm{Binomial}(B,q)$ and
+$h_B(q)=\E[\1\{K>0\}/K]$. Universal constants $c,C>0$ satisfy
+\[
+c\min\{Bq^2,B^{-1}\}\le qh_B(q)
+\le C\min\{Bq^2,B^{-1}\}.
+\]
+\end{lemma}
+
+\begin{proof}
+Suppose first that $Bq\le1$. Since $1/K\le1$ on $K>0$,
+\[
+qh_B(q)\le q\Prob(K>0)\le Bq^2.
+\]
+For the reverse inequality,
+\[
+qh_B(q)\ge q\Prob(K=1)=Bq^2(1-q)^{B-1}.
+\]
+When $B=1$ the final factor equals one. When $B\ge2$, $q\le1/B$ and
+$(1-q)^{B-1}\ge(1-1/B)^{B-1}\ge e^{-1}$, up to an immaterial universal
+constant.
+
+Now suppose $Bq\ge1$. For $K\ge1$, $K^{-1}\le2(K+1)^{-1}$, while
+\[
+\E\frac1{K+1}
+=\frac{1-(1-q)^{B+1}}{(B+1)q}.
+\]
+Thus $qh_B(q)\le2/(B+1)\le2/B$. For the lower bound, Markov's inequality and
+$\E K=Bq$ give $\Prob(K>2Bq)\le1/2$, whereas
+$\Prob(K=0)=(1-q)^B\le e^{-Bq}\le e^{-1}$. Hence
+\[
+\Prob(1\le K\le2Bq)\ge1/2-e^{-1}>0,
+\]
+and on this event $K^{-1}\ge(2Bq)^{-1}$. Therefore $qh_B(q)\ge c/B$.
+\end{proof}
+
+\begin{lemma}[Weighted missing mass]
+Let $p>1$, $b>1$, $q_j\asympconst j^{-p}$, and
+$s_j\asympconst j^{-b}$. Then, uniformly in $B,M\ge2$,
+\[
+\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B
+\asympconst M^{1-b}+B^{-(b-1)/p}.
+\]
+\end{lemma}
+
+\begin{proof}
+The tail satisfies $\sum_{j>M}s_j\asymp M^{1-b}$. Put $J=B^{1/p}$ and
+$\beta=(b-1)/p$. For the upper bound, $(1-q_j)^B\le e^{-cBj^{-p}}$, and an
+integral comparison gives
+\[
+\sum_{j\ge1}j^{-b}e^{-cBj^{-p}}
+\le C B^{-\beta}.
+\]
+For completeness, split at $J$. The part $j>J$ is bounded by $CJ^{1-b}$.
+For $j\le J$, compare to the integral and substitute $u=cBx^{-p}$; the result
+is a constant multiple of
+$B^{-\beta}\int_c^\infty u^{\beta-1}e^{-u}\,du$.
+
+For the lower bound, the approximation tail already gives $cM^{1-b}$.
+Choose a sufficiently large constant $A$. If $M\le2AJ$, this term is also at
+least a constant multiple of $J^{1-b}$. If $M>2AJ$, then
+$[AJ,2AJ]\subseteq[1,M]$ and $Bq_j\le1/2$ throughout that annulus. Hence
+$(1-q_j)^B\ge(1-1/(2B))^B\ge c$, and summing $s_j$ over the annulus gives
+$cJ^{1-b}=cB^{-\beta}$.
+\end{proof}
+
+\begin{lemma}[Variance sum]
+Under the assumptions above,
+\[
+\sum_{j\le M}q_jh_B(q_j)
+\asympconst \frac{\min\{M,B^{1/p}\}}{B}.
+\]
+\end{lemma}
+
+\begin{proof}
+By the reciprocal-count lemma, the summand is comparable to
+$\min\{Bq_j^2,B^{-1}\}$. Put $J=B^{1/p}$. For $j\le J$, $Bq_j$ is bounded
+below by a positive constant, so the summand is comparable to $B^{-1}$. For
+$j>J$, it is comparable to $Bj^{-2p}$. If $M\le J$, summing gives $M/B$.
+If $M>J$, the first part contributes $J/B$, while
+$B\sum_{j>J}j^{-2p}\asymp BJ^{1-2p}=J/B$. Matching lower bounds follow from
+the same regions.
+\end{proof}
+
+\begin{theorem}[Power-law risk]
+If $\lambda_j\asymp j^{-a}$, $\tau_j\asymp j^r$, and
+$s_j\asymp j^{-b}$, with $a>1$, $r\ge0$, and $b>1$, then for
+$p=a+r$,
+\[
+\E\risk\asympconst M^{1-b}+B^{-(b-1)/p}
++\sigma^2\frac{\min\{M,B^{1/p}\}}{B}.
+\]
+\end{theorem}
+
+\begin{proof}
+Equation $q_j=(\lambda_j/\tau_j)/Z$ gives $q_j\asymp j^{-p}$ and
+$\lambda_j/\tau_j=Zq_j$. Apply the preceding two lemmas to the exact identity.
+\end{proof}

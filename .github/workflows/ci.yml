@@ -2,7 +2,14 @@ name: CI
 
 on:
   push:
+    paths-ignore:
+      - "paper/*.pdf"
+      - "paper/figures/*.pdf"
+      - "results/**"
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   tests:
@@ -17,8 +24,18 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run unit tests
         run: make test
-      - name: Run exact pilot smoke test
+      - name: Run exact-risk smoke test
         run: >-
           PYTHONPATH=experiments python experiments/exact_risk.py
           --model-size 4096 --max-power 14 --fit-points 5
           --output-dir /tmp/exact-pilot
+      - name: Run dense-representation smoke test
+        run: >-
+          PYTHONPATH=experiments python experiments/dense_features.py
+          --model-size 48 --block-powers 3 4 5 --trials 3 --fit-points 2
+          --output-dir /tmp/dense-features
+      - name: Run dense-AR smoke test
+        run: >-
+          PYTHONPATH=experiments python experiments/dense_ar_control.py
+          --dimension 24 --n-values 6 10 16 --trials 3 --fit-points 2
+          --output-dir /tmp/dense-ar

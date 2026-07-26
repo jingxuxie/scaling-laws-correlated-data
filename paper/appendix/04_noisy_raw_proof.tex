@@ -1,0 +1,80 @@
+\section{Noisy raw horizons via fractional dwell moments}
+
+Let $D=\tau_J$ for $J\sim q$, so $\E D=\mu$. When $r>0$,
+\[
+\E D^\nu\asympconst\sum_{j\ge1}j^{-(a+r)+r\nu}<\infty
+\quad\Longleftrightarrow\quad
+\nu<1+\frac{a-1}{r}.
+\]
+For $r=0$, $D$ is uniformly bounded.
+
+Fix $N$ and set $B_N=\lfloor N/(2\mu)\rfloor$. Let
+$S_{B_N}=\sum_{k=1}^{B_N}D_k$. Define an estimator that uses the first $B_N$
+complete block averages when $S_{B_N}\le N$, and outputs zero otherwise.
+
+\begin{lemma}[Completion probability]
+For every $1<\nu\le2$ with $\E D^\nu<\infty$,
+\[
+\Prob(S_{B_N}>N)\le C_\nu N^{1-\nu}.
+\]
+\end{lemma}
+
+\begin{proof}
+For all sufficiently large $N$, $N-\mu B_N\ge N/2$. Apply the
+von Bahr--Esseen inequality \cite{vonbahr1965inequalities} to the independent,
+mean-zero variables $D_k-\mu$:
+\[
+\E\left|\sum_{k=1}^{B_N}(D_k-\mu)\right|^\nu
+\le C_\nu B_N\E|D-\mu|^\nu\le C_\nu' N.
+\]
+Markov's inequality at threshold $N/2$ gives the result.
+\end{proof}
+
+\begin{theorem}[Noisy hard-target raw rate]
+Let $p=a+r$, $1<b\le p$, and $\beta=(b-1)/p$. Suppose $\sigma=O(1)$ and either
+$r=0$ or $\beta<(a-1)/r$. Then, over the signed source class,
+\[
+\inf_{\widehat\theta}\sup_{\theta\in\Theta_s}\E\risk
+\asympconst M^{1-b}+N^{-\beta}.
+\]
+The upper bound is attained by the completion estimator above.
+\end{theorem}
+
+\begin{proof}
+Choose $\nu$ such that
+$1+\beta<\nu\le2$ and, when $r>0$,
+$\nu<1+(a-1)/r$. Such a choice exists by assumption. Let $\mathcal E$ be the
+completion event. Since risk is nonnegative,
+\[
+\E[\risk(\widehat\theta_{B_N},\theta)\1_{\mathcal E}]
+\le\E\risk(\widehat\theta_{B_N},\theta).
+\]
+On $\mathcal E^c$, the zero estimate has risk at most
+$S_0=\sum_js_j$. The finite-block theorem and the completion lemma therefore
+give
+\[
+\E\risk\lesssim
+M^{1-b}+N^{-\beta}
++\sigma^2\frac{\min\{M,N^{1/p}\}}{N}
++N^{1-\nu}.
+\]
+The final term is $o(N^{-\beta})$. The variance term is also absorbed. If
+$M\le N^{1/p}$, then $M/N\le M^{1-b}$ because $M^b\le N^{b/p}\le N$. If
+$M>N^{1/p}$, then
+$N^{1/p-1}=N^{-(p-1)/p}\le N^{-\beta}$ because $b\le p$.
+
+For the lower bound, noise cannot make unseen signs easier to estimate. The
+raw-horizon annulus argument with the product Rademacher prior gives
+$cN^{-\beta}$, and support restriction gives $cM^{1-b}$.
+\end{proof}
+
+\paragraph{Smooth targets.}
+The same calculation gives the general upper bound
+\[
+M^{1-b}+N^{-(b-1)/p}
++\sigma^2\frac{\min\{M,N^{1/p}\}}{N}+N^{1-\nu}.
+\]
+When $b>p$, selecting $M\asymp(N/\sigma^2)^{1/b}$ yields the usual
+variance-limited exponent $(b-1)/b$, provided a dwell moment with
+$\nu>1+(b-1)/b$ exists. We do not claim a sharp noisy minimax lower bound for
+this smooth raw-horizon regime.

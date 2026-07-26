@@ -1,47 +1,61 @@
 # Research status
 
-## Completed in the initial proof pass
+## Theorem stack completed
 
-- Exact regenerative/block model with the same time-marginal covariance for
-  all persistence exponents.
-- Exact finite-sample bias--variance decomposition.
-- Matching power-law upper and lower rates.
-- Exact noiseless minimax characterization over a signed source class.
-- Exact asymptotic scaling function and leading Gamma-function constant.
-- Stationary semi-Markov interpretation and reversible Markov realization.
-- Fixed-raw-horizon theorem under finite-variance dwell times, including
-  equilibrium initialization.
-- Exact numerical learning curves, phase-collapse plots, block Monte Carlo,
-  fixed-horizon Monte Carlo, and automated tests.
+- Exact finite-block bias--variance identity.
+- Uniform model--innovation--noise scaling law.
+- Exact noiseless minimax equality over a signed source class.
+- Full model--data scaling function and Gamma-function asymptotic constant.
+- Fixed raw-horizon theorem for every dwell exponent `r >= 0`, without a
+  finite-variance requirement.
+- Stationary-equilibrium inspection-paradox phase
+  `N^{-(a-1)/r}` with matching upper and lower bounds.
+- Noisy hard-target fixed-horizon theorem using fractional dwell moments and
+  the von Bahr--Esseen inequality.
+- Exact invariance under known invertible dense representations, with spectral
+  preservation under bounded condition number.
+- Reversible nonseparable Markov realization.
+- Finite-dimensional dense Gaussian AR exact-recovery proposition, which
+  rules out the overbroad claim that autocorrelation alone forces the renewal
+  exponent.
 
-## Main scientific claim currently supported
+## Proof-audit corrections
 
-A common persistence time changes constants, but mode-dependent persistence
-aligned with a power-law feature spectrum changes the data exponent from
+- Lower-bound annuli now split correctly according to whether model
+  approximation already controls the data term.
+- The raw-horizon lower bound uses the same uniform model-size split.
+- The scaling-function proof includes an explicit uniform binomial-to-Poisson
+  remainder bound before passing to the Riemann integral.
+- No finite-variance assumption remains in the noiseless boundary-start
+  theorem.
 
-\[
-\frac{b-1}{a}
-\quad\text{to}\quad
-\frac{b-1}{a+r}.
-\]
+## Experimental package completed
 
-The mechanism is a change from the marginal spectrum \(\lambda_j\) to the
-innovation spectrum \(q_j\propto\lambda_j/\tau_j\).
+- Exact slopes and phase collapse.
+- Independent innovation-block Monte Carlo.
+- Fixed raw-horizon Monte Carlo.
+- Infinite-variance dwell and stationary inspection-paradox simulation.
+- Noisy hard/smooth target model-selection regimes.
+- Dense representation validation.
+- Dense Gaussian AR negative control.
+- Sequential appliance-energy proxy with randomized-subset falsification.
+- Automated tests, official-format PDF audit, and completed AAAI
+  reproducibility checklist workflow.
 
 ## Scope discipline
 
-The current proof is for persistent coordinate/spectral sampling. It does not
-yet prove that arbitrary dense Gaussian AR covariates follow the same law.
-That distinction is deliberate and should remain explicit in the abstract,
-introduction, theorem statements, and limitations.
+The theorem is exact for persistent spectral renewal sampling. It does not
+assert the same exponent for arbitrary dense dependent covariates. The dense AR
+counterexample makes this boundary explicit. The real-data result is an
+illustrative diagnostic, not evidence of universality.
 
+## Remaining human-only submission tasks
 
-## Remaining reviewer-facing risks
-
-- The exact statistical model is sparse spectral sampling; universality for
-  dense Gaussian or random-feature designs is not yet proved.
-- The fixed-raw-horizon theorem is currently noiseless and assumes
-  \(r<a-1\); the heavy-dwell and noisy-stopping regimes may have additional
-  phases.
-- A real sequential dataset and an independently audited proof pass are still
-  needed before describing the manuscript as submission ready.
+1. Audit every proof line independently.
+2. Check every bibliographic record against its primary source.
+3. Review the official PDF visually after the automated audit.
+4. Confirm anonymous code and data packaging rules.
+5. Complete the venue-required AI-use disclosure and author accountability
+   checks.
+6. Replace anonymous metadata only after acceptance or as required by the
+   submission system.
