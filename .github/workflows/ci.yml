@@ -39,3 +39,10 @@ jobs:
           PYTHONPATH=experiments python experiments/dense_ar_control.py
           --dimension 24 --n-values 6 10 16 --trials 3 --fit-points 2
           --output-dir /tmp/dense-ar
+      - name: Run matched-ESS and compute smoke test
+        run: >-
+          PYTHONPATH=experiments python experiments/matched_ess_compute.py
+          --model-size 2048 --horizon-powers 7 8 9 10 --trials 12
+          --raw-fit-points 2 --compute-powers 9 10 11 12 13
+          --compute-max-model-size 256 --compute-grid-size 40
+          --compute-fit-points 3 --output-dir /tmp/matched-ess-compute
