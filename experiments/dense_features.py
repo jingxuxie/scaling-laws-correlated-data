@@ -1,20 +1,12 @@
 #!/usr/bin/env python3
-"""Dense-feature stress tests for spectral renewal scaling.
+"""Dense-representation validation for spectral renewal regression.
 
-The theorem is stated in a spectral basis, but its mechanism is not tied to
-sparse observed vectors.  We test two dense representations of the first M
-spectral modes:
-
-1. an orthogonal random rotation, where normalized Kaczmarz/minimum-norm
-   regression is exactly equivalent to coordinate memorization;
-2. a coherent near-orthogonal random dictionary, where modes interfere and
-   the exact decomposition no longer applies, but the innovation-limited slope
-   should remain visible.
-
-An irreducible power-law tail j>M is added to the test risk, matching the model
-approximation term in the theorem.
+The latent renewal theorem is invariant under any known invertible linear
+representation.  This script checks that identity numerically and then performs
+a deliberately harder stress test: minimum-norm interpolation in a coherent,
+well-conditioned dense dictionary, without explicitly decoding the latent
+coordinates.
 """
-
 from __future__ import annotations
 
 import argparse
@@ -36,8 +28,11 @@ class DenseSummary:
     predicted_exponent: float
     dictionary_fitted_exponent: float
     orthogonal_max_relative_error: float
+    decoded_max_relative_error: float
     dictionary_max_ratio_to_coverage: float
-    coherence: float
+    dictionary_condition_number: float
+    dictionary_max_row_coherence: float
+    mixing_strength: float
     model_size: int
     trials: int
     fit_start_block: int
@@ -57,29 +52,60 @@ def spectral_sequences(
     return lam, q, target, tail
 
 
-def make_dictionary(
-    model_size: int,
-    coherence: float,
-    seed: int,
-) -> np.ndarray:
-    """Return a square dense dictionary with controlled departure from rotation."""
-    if not 0.0 <= coherence < 1.0:
-        raise ValueError("coherence must lie in [0,1)")
+def make_dictionary(model_size: int, mixing_strength: float, seed: int) -> np.ndarray:
+    """Return a dense square dictionary with normalized rows.
+
+    ``mixing_strength=0`` is orthogonal.  Positive values perturb a Haar-like
+    orthogonal matrix and then normalize rows.  The condition number and actual
+    row coherence are measured and retained with the results.
+    """
+    if not 0.0 <= mixing_strength < 1.0:
+        raise ValueError("mixing_strength must lie in [0,1)")
     rng = np.random.default_rng(seed)
     gaussian = rng.normal(size=(model_size, model_size))
     orthogonal, _ = np.linalg.qr(gaussian)
-    if coherence == 0:
+    if mixing_strength == 0:
         return orthogonal
     perturbation = rng.normal(size=(model_size, model_size)) / math.sqrt(model_size)
     dictionary = (
-        math.sqrt(1.0 - coherence) * orthogonal
-        + math.sqrt(coherence) * perturbation
+        math.sqrt(1.0 - mixing_strength) * orthogonal
+        + math.sqrt(mixing_strength) * perturbation
     )
-    dictionary /= np.linalg.norm(dictionary, axis=1, keepdims=True)
-    return dictionary
+    norms = np.linalg.norm(dictionary, axis=1, keepdims=True)
+    if np.any(norms <= 0):
+        raise RuntimeError("degenerate dictionary row")
+    return dictionary / norms
 
 
-def conditional_dense_risk(
+def max_row_coherence(dictionary: np.ndarray) -> float:
+    normalized = dictionary / np.linalg.norm(dictionary, axis=1, keepdims=True)
+    gram = np.abs(normalized @ normalized.T)
+    np.fill_diagonal(gram, 0.0)
+    return float(np.max(gram))
+
+
+def exact_coverage_risk(
+    blocks: int, q: np.ndarray, target: np.ndarray, tail: float
+) -> float:
+    return tail + float(np.dot(target, np.exp(blocks * np.log1p(-q))))
+
+
+def decoded_dense_risk(
+    dictionary: np.ndarray,
+    theta: np.ndarray,
+    lam: np.ndarray,
+    tail: float,
+    seen_modes: np.ndarray,
+) -> float:
+    """Prediction risk after exact latent decoding through a known dictionary."""
+    latent_hat = np.zeros_like(theta)
+    latent_hat[seen_modes] = theta[seen_modes]
+    ambient_hat = np.linalg.solve(dictionary, latent_hat)
+    prediction_error = dictionary @ ambient_hat - theta
+    return tail + float(np.dot(lam, prediction_error**2))
+
+
+def conditional_min_norm_risk(
     dictionary: np.ndarray,
     theta: np.ndarray,
     teacher: np.ndarray,
@@ -88,7 +114,7 @@ def conditional_dense_risk(
     seen_modes: np.ndarray,
     ridge: float = 1e-10,
 ) -> float:
-    """Risk of the minimum-norm interpolant on the observed mode equations."""
+    """Risk of the ambient minimum-norm interpolant on observed mode equations."""
     if seen_modes.size == 0:
         prediction_error = -theta
     else:
@@ -102,16 +128,11 @@ def conditional_dense_risk(
     return tail + float(np.dot(lam, prediction_error**2))
 
 
-def exact_coverage_risk(
-    blocks: int,
-    q: np.ndarray,
-    target: np.ndarray,
-    tail: float,
-) -> float:
-    return tail + float(np.dot(target, np.exp(blocks * np.log1p(-q))))
-
-
-def fit_exponent(blocks: np.ndarray, risk: np.ndarray, fit_points: int) -> tuple[float, int, int]:
+def fit_exponent(
+    blocks: np.ndarray, risk: np.ndarray, fit_points: int
+) -> tuple[float, int, int]:
+    if fit_points < 2 or fit_points > blocks.size:
+        raise ValueError("invalid fit_points")
     slope, _ = np.polyfit(
         np.log(blocks[-fit_points:].astype(np.float64)),
         np.log(risk[-fit_points:]),
@@ -122,6 +143,8 @@ def fit_exponent(blocks: np.ndarray, risk: np.ndarray, fit_points: int) -> tuple
 
 def write_csv(path: Path, rows: Iterable[dict[str, float]]) -> None:
     rows = list(rows)
+    if not rows:
+        raise ValueError("cannot write an empty table")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
@@ -135,7 +158,7 @@ def run_experiment(
     b: float,
     r_values: Sequence[float],
     model_size: int,
-    coherence: float,
+    mixing_strength: float,
     block_powers: Sequence[int],
     trials: int,
     fit_points: int,
@@ -146,30 +169,37 @@ def run_experiment(
     rng = np.random.default_rng(seed)
     signs = rng.choice(np.asarray([-1.0, 1.0]), size=model_size)
     orthogonal = make_dictionary(model_size, 0.0, seed + 1)
-    dictionary = make_dictionary(model_size, coherence, seed + 2)
+    dictionary = make_dictionary(model_size, mixing_strength, seed + 2)
+    dictionary_condition = float(np.linalg.cond(dictionary))
+    dictionary_coherence = max_row_coherence(dictionary)
     blocks_array = np.asarray([2**power for power in block_powers], dtype=np.int64)
     rows: list[dict[str, float]] = []
     summaries: dict[float, DenseSummary] = {}
 
     fig, ax = plt.subplots(figsize=(6.6, 4.3))
-    for r_index, r in enumerate(r_values):
+    for r in r_values:
         lam, q, target, tail = spectral_sequences(a, b, r, model_size)
         theta = signs * np.sqrt(target / lam)
-        orthogonal_teacher = orthogonal.T @ theta
+        orthogonal_teacher = np.linalg.solve(orthogonal, theta)
         dictionary_teacher = np.linalg.solve(dictionary, theta)
         exact_values: list[float] = []
+        decoded_values: list[float] = []
         orthogonal_values: list[float] = []
         dictionary_values: list[float] = []
         dictionary_stderr: list[float] = []
 
-        for power, blocks in zip(block_powers, blocks_array, strict=True):
+        for blocks in blocks_array:
             exact = exact_coverage_risk(int(blocks), q, target, tail)
+            decoded_risks = np.empty(trials, dtype=np.float64)
             orthogonal_risks = np.empty(trials, dtype=np.float64)
             dictionary_risks = np.empty(trials, dtype=np.float64)
             for trial in range(trials):
                 sampled = rng.zipf(a + r, size=int(blocks)) - 1
                 seen = np.unique(sampled[sampled < model_size]).astype(np.int64)
-                orthogonal_risks[trial] = conditional_dense_risk(
+                decoded_risks[trial] = decoded_dense_risk(
+                    dictionary, theta, lam, tail, seen
+                )
+                orthogonal_risks[trial] = conditional_min_norm_risk(
                     orthogonal,
                     theta,
                     orthogonal_teacher,
@@ -177,7 +207,7 @@ def run_experiment(
                     tail,
                     seen,
                 )
-                dictionary_risks[trial] = conditional_dense_risk(
+                dictionary_risks[trial] = conditional_min_norm_risk(
                     dictionary,
                     theta,
                     dictionary_teacher,
@@ -185,12 +215,14 @@ def run_experiment(
                     tail,
                     seen,
                 )
+            decoded_mean = float(np.mean(decoded_risks))
             orthogonal_mean = float(np.mean(orthogonal_risks))
             dictionary_mean = float(np.mean(dictionary_risks))
             dictionary_error = float(
                 np.std(dictionary_risks, ddof=1) / math.sqrt(trials)
             )
             exact_values.append(exact)
+            decoded_values.append(decoded_mean)
             orthogonal_values.append(orthogonal_mean)
             dictionary_values.append(dictionary_mean)
             dictionary_stderr.append(dictionary_error)
@@ -201,12 +233,16 @@ def run_experiment(
                     "r": r,
                     "blocks": int(blocks),
                     "model_size": model_size,
-                    "coherence": coherence,
+                    "mixing_strength": mixing_strength,
+                    "condition_number": dictionary_condition,
+                    "max_row_coherence": dictionary_coherence,
                     "trials": trials,
                     "exact_coverage_risk": exact,
-                    "orthogonal_dense_mean": orthogonal_mean,
-                    "dictionary_dense_mean": dictionary_mean,
-                    "dictionary_dense_stderr": dictionary_error,
+                    "decoded_dense_mean": decoded_mean,
+                    "orthogonal_min_norm_mean": orthogonal_mean,
+                    "dictionary_min_norm_mean": dictionary_mean,
+                    "dictionary_min_norm_stderr": dictionary_error,
+                    "decoded_relative_error": (decoded_mean - exact) / exact,
                     "orthogonal_relative_error": (orthogonal_mean - exact) / exact,
                     "dictionary_ratio_to_exact": dictionary_mean / exact,
                 }
@@ -215,22 +251,26 @@ def run_experiment(
         fitted, fit_start, fit_end = fit_exponent(
             blocks_array, np.asarray(dictionary_values), fit_points
         )
+        exact_array = np.asarray(exact_values)
+        decoded_array = np.asarray(decoded_values)
+        orthogonal_array = np.asarray(orthogonal_values)
+        dictionary_array = np.asarray(dictionary_values)
         summary = DenseSummary(
             r=r,
             predicted_exponent=(b - 1.0) / (a + r),
             dictionary_fitted_exponent=fitted,
             orthogonal_max_relative_error=float(
-                np.max(
-                    np.abs(
-                        (np.asarray(orthogonal_values) - np.asarray(exact_values))
-                        / np.asarray(exact_values)
-                    )
-                )
+                np.max(np.abs((orthogonal_array - exact_array) / exact_array))
+            ),
+            decoded_max_relative_error=float(
+                np.max(np.abs((decoded_array - exact_array) / exact_array))
             ),
             dictionary_max_ratio_to_coverage=float(
-                np.max(np.asarray(dictionary_values) / np.asarray(exact_values))
+                np.max(dictionary_array / exact_array)
             ),
-            coherence=coherence,
+            dictionary_condition_number=dictionary_condition,
+            dictionary_max_row_coherence=dictionary_coherence,
+            mixing_strength=mixing_strength,
             model_size=model_size,
             trials=trials,
             fit_start_block=fit_start,
@@ -241,7 +281,7 @@ def run_experiment(
             blocks_array,
             exact_values,
             linewidth=1.4,
-            label=rf"exact occupancy, $r={r:g}$",
+            label=rf"exact/decoded, $r={r:g}$",
         )
         ax.errorbar(
             blocks_array,
@@ -253,16 +293,16 @@ def run_experiment(
             capsize=2,
             color=line.get_color(),
             label=(
-                rf"dense dictionary, fit $-{fitted:.3f}$ "
+                rf"ambient min-norm, fit $-{fitted:.3f}$ "
                 rf"(pred. $-{summary.predicted_exponent:.3f}$)"
             ),
         )
 
     ax.set_xlabel("Innovation blocks $B$")
     ax.set_ylabel("Expected excess risk")
-    ax.set_title("The spectral-persistence law survives dense mode mixing")
+    ax.set_title("Dense representations preserve the persistence-controlled slope")
     ax.grid(True, which="both", linewidth=0.35, alpha=0.5)
-    ax.legend(frameon=False, fontsize=7.4, ncol=2)
+    ax.legend(frameon=False, fontsize=7.2, ncol=2)
     fig.tight_layout()
     fig.savefig(output_dir / "dense_features.pdf", bbox_inches="tight")
     plt.close(fig)
@@ -283,12 +323,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--a", type=float, default=2.0)
     parser.add_argument("--b", type=float, default=1.8)
     parser.add_argument("--r-values", type=float, nargs="+", default=[0.0, 0.8])
-    parser.add_argument("--model-size", type=int, default=512)
-    parser.add_argument("--coherence", type=float, default=0.2)
+    parser.add_argument("--model-size", type=int, default=384)
+    parser.add_argument("--mixing-strength", type=float, default=0.2)
     parser.add_argument(
         "--block-powers", type=int, nargs="+", default=[6, 8, 10, 12, 14]
     )
-    parser.add_argument("--trials", type=int, default=120)
+    parser.add_argument("--trials", type=int, default=80)
     parser.add_argument("--fit-points", type=int, default=3)
     parser.add_argument("--seed", type=int, default=37)
     parser.add_argument(
@@ -304,7 +344,7 @@ def main() -> None:
         b=args.b,
         r_values=args.r_values,
         model_size=args.model_size,
-        coherence=args.coherence,
+        mixing_strength=args.mixing_strength,
         block_powers=args.block_powers,
         trials=args.trials,
         fit_points=args.fit_points,
@@ -314,9 +354,10 @@ def main() -> None:
     for r, summary in summaries.items():
         print(
             f"r={r:g}: predicted={summary.predicted_exponent:.6f}, "
-            f"dense dictionary fit={summary.dictionary_fitted_exponent:.6f}, "
-            f"orthogonal max relative error={summary.orthogonal_max_relative_error:.4f}, "
-            f"dictionary max ratio={summary.dictionary_max_ratio_to_coverage:.3f}"
+            f"ambient fit={summary.dictionary_fitted_exponent:.6f}, "
+            f"decoded max rel.err={summary.decoded_max_relative_error:.4f}, "
+            f"cond={summary.dictionary_condition_number:.2f}, "
+            f"row coherence={summary.dictionary_max_row_coherence:.3f}"
         )
 
 

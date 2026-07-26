@@ -1,12 +1,13 @@
 # Spectral Scaling Laws with Correlated Data
 
-This repository develops an exactly solvable theory of scaling laws for
-linear regression on persistent data streams.
+This repository develops an exactly solvable theory of scaling laws for linear
+regression on persistent data streams. The main point is that correlation is
+not fully summarized by one effective sample size when different spectral
+modes refresh at different rates.
 
-## Core claim
+## Main result
 
-Let the time-marginal covariance spectrum, mode persistence, and target energy
-satisfy
+Let the marginal covariance mass, dwell time, and target energy satisfy
 
 \[
 \lambda_j\asymp j^{-a},\qquad
@@ -14,14 +15,14 @@ satisfy
 s_j=\lambda_j\theta_j^2\asymp j^{-b}.
 \]
 
-To keep the same marginal covariance while mode `j` persists for `tau_j`, new
-blocks arrive with probability
+Keeping the same one-time covariance while mode `j` persists for `tau_j`
+forces statistically new blocks to arrive according to
 
 \[
-q_j\propto \lambda_j/\tau_j\asymp j^{-(a+r)}.
+q_j\propto\lambda_j/\tau_j\asymp j^{-(a+r)}.
 \]
 
-For the coordinate-wise block-averaging estimator, the proof draft establishes
+For the block-averaging estimator trained on `B` innovations,
 
 \[
 \mathbb E\mathcal R
@@ -31,51 +32,77 @@ M^{-(b-1)}+B^{-(b-1)/(a+r)}
 \right).
 \]
 
-In the noiseless case, the first two terms are also the exact minimax risk over
-a signed source class. Uniform persistence (`r=0`) changes constants only;
-mode-dependent persistence changes the data exponent. When deterministic dwell
-times have finite variance (`r < a - 1`), the same exponent holds for a
-trajectory containing exactly `N` raw observations, not only for a fixed number
-of renewal blocks.
+The noiseless expression is the exact minimax risk over a signed source class.
+For a stream observed for exactly `N` raw steps:
+
+- boundary initialization has rate
+  `M^{-(b-1)} + N^{-(b-1)/(a+r)}` for every `r >= 0` in the stated source range;
+- stationary initialization adds the inspection-paradox phase
+  `N^{-(a-1)/r}`;
+- a fractional-moment argument transfers the noisy hard-target rate beyond the
+  finite-variance dwell regime.
+
+The result is invariant under known well-conditioned dense changes of
+representation. A dense Gaussian AR control establishes an equally important
+boundary: correlation alone does not universally imply the renewal exponent.
+
+## Empirical package
+
+The repository contains:
+
+- exact finite-sample summation and phase-collapse experiments;
+- block and fixed-raw-horizon Monte Carlo;
+- infinite-variance dwell and stationary inspection-paradox tests;
+- exact noisy model-selection experiments;
+- dense-dictionary validation and a dense Gaussian AR negative control;
+- a chronological appliance-energy diagnostic comparing the marginal spectrum
+  with the persistence-adjusted spectrum;
+- deterministic tests, retained CSV/JSON outputs, and CI workflows.
+
+The appliance experiment fits its proxy only on sample sizes 128--1024 and
+extrapolates to 2048--8192. In the retained run, mode-wise persistence lowers
+contiguous-window extrapolation log-RMSE from 1.099 to 0.951, while it hurts
+random-subset prediction, the intended falsification control.
 
 ## Repository layout
 
-- `paper/main.tex`: conference-length main-paper source.
-- `paper/supplement.tex`: separately compiled technical appendix.
-- `paper/appendix_content.tex`: full proofs and additional experiments.
-- `paper/references.bib`: verified primary references.
-- `notes/proof_roadmap.md`: theorem stack, proof details, and open issues.
-- `experiments/exact_risk.py`: exact finite-sample curves and phase collapse.
-- `experiments/monte_carlo.py`: independent block-sampling validation.
-- `experiments/raw_horizon.py`: fixed-raw-trajectory validation.
-- `experiments/test_*.py`: deterministic unit tests.
-- `results/`: generated CSV, JSON, and figure outputs.
+- `paper/main.tex`: AAAI-27 main-paper source.
+- `paper/supplement.tex`: complete technical supplement.
+- `paper/appendix/`: proofs and experimental details.
+- `experiments/`: exact calculations, simulations, data experiment, and tests.
+- `results/`: retained machine-readable outputs.
+- `tools/build_checklist.py`: completes the unmodified official AAAI checklist.
+- `tools/audit_submission.py`: checks page count, references, fonts, style use,
+  and LaTeX diagnostics.
+- `SUBMISSION_CHECKLIST.md`: final author-side checks.
 
-## Reproduce the pilot
+## Reproduction
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-make experiments
 make test
-make paper  # builds main.pdf and supplement.pdf
+make experiments
+make real-data
+make paper
+make checklist
+make audit
 ```
 
-The experiment suite uses `O(M)` memory and runs on a laptop. No GPU is
-required.
+The synthetic suite is laptop-scale and requires no GPU. The real-data command
+downloads the public appliance-energy CSV recorded by the experiment script.
 
-## AAAI format
+## Submission artifacts
 
-The repository already contains the official author kit under
-`AAAI_AuthorKit27/`. `make paper` adds that directory to `TEXINPUTS` and
-`BSTINPUTS`, so the manuscript uses the official submission style without
-copying or modifying the kit. Outside this repository, the same source falls
-back to a readable one-column draft when the style files are unavailable.
+The `Submission build` GitHub Action performs the full test suite, reruns the
+real-data experiment, regenerates figures, compiles with the unmodified
+AAAI-27 author kit, builds the separate reproducibility checklist, audits the
+PDFs, and commits the resulting artifacts and JSON audit report to the working
+branch.
 
-## Current scope
-
-The completed proof is for persistent coordinate or spectral sampling. It
-does not yet establish the same exponent for arbitrary dense Gaussian time
-series. The paper states this limitation explicitly; dense random-feature and
-real sequential-data validations are the next milestones.
+The repository is a submission-ready research draft, not a substitute for
+human accountability. Before submission, the authors must independently audit
+every proof and citation, verify the venue-specific AI-use declaration, add
+final authorship metadata outside anonymous review mode, and inspect the final
+PDF and supplementary archive.

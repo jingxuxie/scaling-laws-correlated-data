@@ -1,0 +1,78 @@
+\section{Exact Risk, Scaling, and Minimaxity}
+
+For $K\sim\operatorname{Binomial}(B,q)$, write
+$h_B(q)=\E[\1\{K>0\}/K]$.
+
+\begin{theorem}[Exact finite-block risk]
+\label{thm:exact}
+For every $B,M\ge1$,
+\begin{align}
+\E\risk(\widehat\theta,\theta)
+={}&\sum_{j>M}s_j
++\sum_{j\le M}s_j(1-q_j)^B \nonumber\\
+&+\sigma^2\sum_{j\le M}\frac{\lambda_j}{\tau_j}h_B(q_j).
+\label{eq:exact-risk}
+\end{align}
+\end{theorem}
+The three terms are model approximation, unseen-mode bias, and label-noise
+variance. The identity follows by conditioning on $K_j$: if $K_j=0$ the mode
+costs $s_j$; otherwise its signed average is unbiased with variance
+$\sigma^2/(\tau_jK_j)$.
+
+The key count estimate is
+\begin{equation}
+qh_B(q)\asympconst \min\{Bq^2,B^{-1}\}.
+\label{eq:reciprocal-count}
+\end{equation}
+For $Bq\le1$, the event $K=1$ gives the lower bound and
+$h_B(q)\le\Prob(K>0)$ the upper. For $Bq\ge1$, a constant-probability event
+$1\le K\le2Bq$ gives the lower bound, while
+$1/K\le2/(K+1)$ and the binomial identity for $\E[(K+1)^{-1}]$ give the upper.
+
+\begin{theorem}[Persistent spectral scaling law]
+\label{thm:scaling}
+Assume
+\begin{equation}
+\lambda_j\asympconst j^{-a},\qquad
+\tau_j\asympconst j^r,\qquad
+s_j\asympconst j^{-b},
+\label{eq:power-laws}
+\end{equation}
+where $a>1$, $r\ge0$, and $b>1$. Put $p=a+r$. Uniformly for $B,M\ge2$,
+\begin{equation}
+\boxed{
+\E\risk\asympconst
+M^{-(b-1)}+B^{-(b-1)/p}
++\sigma^2\frac{\min\{M,B^{1/p}\}}{B}.}
+\label{eq:block-scaling}
+\end{equation}
+\end{theorem}
+Indeed, $q_j\asymp j^{-p}$, so the critical mode is
+$J_B\asymp B^{1/p}$. Splitting each sum at $J_B$ proves
+Equation~\eqref{eq:block-scaling}; the supplement gives uniform upper and lower
+bounds. Uniform persistence has $r=0$ and preserves the usual exponent
+$(b-1)/a$. If weaker modes persist longer, $r>0$ replaces $a$ by $a+r$.
+
+The noise term creates two regimes. For fixed $\sigma>0$, if $1<b\le p$, the
+frontier $M\asymp B^{1/p}$ gives rate $B^{-(b-1)/p}$. If $b>p$, the best model
+for this estimator satisfies $M_\star\asymp(B/\sigma^2)^{1/b}$ and achieves
+$(\sigma^2/B)^{(b-1)/b}$.
+
+\begin{theorem}[Exact noiseless minimax risk]
+\label{thm:minimax}
+Fix positive $(s_j)$ and let
+$\Theta_s=\{\theta^\omega:\theta_j^\omega=\omega_j\sqrt{s_j/\lambda_j},
+\ \omega_j\in\{-1,1\}\}$. Among estimators supported on the first $M$ modes,
+when $\sigma=0$,
+\begin{equation}
+\inf_{\widetilde\theta}\sup_{\theta\in\Theta_s}
+\E\risk(\widetilde\theta,\theta)
+=\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B.
+\label{eq:minimax}
+\end{equation}
+\end{theorem}
+The upper bound is attained by Equation~\eqref{eq:estimator}. For the lower
+bound, put independent Rademacher priors on the signs. Conditional on mode $j$
+being unseen, its sign remains independent of the data and incurs Bayes risk
+$s_j$. Thus the exponent change is information-theoretic, not an optimizer
+artifact.

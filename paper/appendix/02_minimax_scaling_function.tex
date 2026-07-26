@@ -1,0 +1,59 @@
+\section{Minimax equality and the model--data scaling function}
+
+\subsection{Exact noiseless minimax equality}
+Fix energies $s_j>0$ and let
+$\Theta_s=\{\theta^\omega:\theta_j^\omega=\omega_j\sqrt{s_j/\lambda_j},
+\ \omega_j\in\{-1,1\}\}$. Restrict estimates to the first $M$ modes.
+
+\begin{theorem}
+In the noiseless block experiment,
+\[
+\inf_{\widehat\theta}\sup_{\theta\in\Theta_s}\E\risk
+=\sum_{j>M}s_j+\sum_{j\le M}s_j(1-q_j)^B.
+\]
+\end{theorem}
+
+\begin{proof}
+An observed noiseless block reveals $S_k\overline Y_k=\theta_{J_k}$ exactly, so
+the coordinate memorizer incurs $s_j$ precisely for truncated or unseen modes.
+For the lower bound, put the product Rademacher prior on $\omega$. If mode $j$
+is unseen, the likelihood is independent of $\omega_j$ and the posterior
+remains symmetric. Any estimate has conditional squared prediction error at
+least $s_j$. The event has probability $(1-q_j)^B$. Modes beyond $M$ always
+incur $s_j$. Bayes risk lower-bounds minimax risk, matching the upper bound.
+\end{proof}
+
+\subsection{Scaling function at the frontier}
+Assume exact normalized power laws
+$q_j=c_qj^{-p}$ and $s_j=c_sj^{-b}$, where $p,b>1$. Let
+$M_B/ B^{1/p}\to m\in(0,\infty)$ and $\beta=(b-1)/p$.
+
+\begin{proposition}
+The noiseless risk obeys
+\[
+B^\beta\E\risk\longrightarrow
+c_s\left[\frac{m^{1-b}}{b-1}
++\frac{c_q^{-\beta}}{p}
+\Gamma\!\left(\beta,c_qm^{-p}\right)\right],
+\]
+where $\Gamma(\beta,x)=\int_x^\infty u^{\beta-1}e^{-u}\,du$.
+In particular, as $m\to\infty$, the data-limited constant is
+$c_sc_q^{-\beta}\Gamma(\beta)/p$.
+\end{proposition}
+
+\begin{proof}
+The approximation term is a regularly varying tail:
+$B^\beta\sum_{j>M_B}s_j\to c_sm^{1-b}/(b-1)$. For the unseen term, use the uniform bound
+\[
+0\le e^{-Bq}-(1-q)^B\le C Bq^2e^{-cBq},\qquad 0\le q\le q_0<1.
+\]
+After summing against $s_j$, the right-hand side is $O(B^{-\beta-1})$ by the
+same critical-scale substitution below; finitely many larger probabilities
+are exponentially negligible. Thus replacing $(1-q_j)^B$ by $e^{-Bq_j}$
+changes the scaled risk by $o(1)$. The Riemann sum with $j=B^{1/p}x$ gives
+\[
+c_s\int_0^m x^{-b}e^{-c_qx^{-p}}\,dx.
+\]
+The substitution $u=c_qx^{-p}$ evaluates this integral as the stated
+incomplete-gamma term.
+\end{proof}

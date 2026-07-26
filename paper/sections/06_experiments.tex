@@ -1,0 +1,79 @@
+\section{Experiments}
+
+All experiments use direct summation or lightweight Monte Carlo and run on a
+laptop. Code, seeds, exact output tables, and tests are included.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{theory_summary.pdf}
+\caption{Theory audit. (a) With identical marginal covariance
+$\lambda_j\propto j^{-2}$ and target energy $s_j\propto j^{-1.8}$, increasing
+persistence changes the data slope exactly as predicted. (b) Model size and
+innovations collapse onto the effective resolution
+$\min\{M,B^{1/(a+r)}\}$. (c) Predicted versus fitted exponents across exact
+block sums, raw-horizon simulations, noisy regimes, dense dictionaries, and
+the stationary heavy-dwell phase.}
+\label{fig:theory-summary}
+\end{figure*}
+
+\paragraph{Exact and raw-horizon rates.}
+For $(a,b)=(2,1.8)$ and $r\in\{0,0.4,0.8\}$, exact finite-$B$ slopes are
+$-0.399999$, $-0.333333$, and $-0.285714$, versus predictions $-0.4$, $-1/3$,
+and $-2/7$. Independent block Monte Carlo differs from the exact identity by
+at most 2.1\%. Streams stopped after exactly $N$ raw examples give
+$-0.399$, $-0.339$, and $-0.290$. In an infinite-variance setting
+$(a,b,r)=(2,5.5,3)$, the boundary-start slope is $-0.895$ versus $-0.9$;
+stationary initialization slows it to $-0.346$, close to the inspection
+prediction $-1/3$.
+
+\paragraph{Noise and model choice.}
+Exact evaluation of the reciprocal-binomial term confirms both regimes. For a
+hard target $(a,b,r)=(2,1.8,0.8)$, the fitted risk and frontier-model exponents
+are $0.284$ and $0.354$ versus $2/7$ and $1/2.8$. For a smooth target $b=4$,
+optimizing over $M$ gives exponents $0.765$ for risk and $0.262$ for model size,
+versus $3/4$ and $1/4$.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{validation_summary.pdf}
+\caption{Scope and external validation. (a) A known dense change of basis is
+exactly risk-invariant; even ambient minimum-norm interpolation in a
+well-conditioned coherent dictionary retains the predicted slope. (b) A dense
+Gaussian AR process, where every mode appears in every sample, does \emph{not}
+follow the renewal $a+r$ formula; this negative control shows that correlation
+alone is insufficient. (c) On appliance-energy data, the
+persistence-adjusted proxy improves out-of-range prediction for contiguous
+windows but not randomized subsets.}
+\label{fig:validation-summary}
+\end{figure*}
+
+\paragraph{Dense representation and negative control.}
+We rotate 512 latent modes into dense observed vectors. Exact decoding agrees
+with latent coverage risk within 1.4\% Monte Carlo error. A perturbed dictionary
+with condition number 4.67 and maximum row coherence 0.13 is deliberately more
+difficult: ambient minimum-norm fits give slopes $-0.398$ and $-0.275$ for
+$r=0$ and $0.8$, versus $-0.400$ and $-0.286$. By contrast, in the tested
+dense Gaussian AR regime, batch-regression slopes are $0.92$--$1.12$, far from
+renewal predictions $0.27$--$0.40$. In finite dimension, such Gaussian designs
+also have full column rank almost surely once $N\ge D$, hence noiseless least
+squares recovers exactly. The renewal exponent is therefore not a generic
+consequence of autocorrelation.
+
+\paragraph{Sequential appliance-energy data.}
+We use the 10-minute appliance-energy stream of
+\citet{candanedo2017appliances}. PCA gives empirical marginal masses
+$\widehat\lambda_j$, ridge coefficients give target energies
+$\widehat s_j$, and each score has estimated integrated autocorrelation time
+$\widehat\tau_j$. We fit only an amplitude and scale on the first four sizes
+(128 through 1024), then extrapolate to the next three sizes (2048 through
+8192) with
+\begin{equation}
+G_\rho(N)=\sum_j\widehat s_j e^{-cN\rho_j},\qquad
+\rho_j\in\left\{\widehat\lambda_j,
+\widehat\lambda_j/\widehat\tau_j\right\}.
+\label{eq:real-proxy}
+\end{equation}
+For contiguous windows, log-RMSE falls from 1.099 to 0.951 (13.4\%). For random
+subsets, the spatial proxy is better (0.823 versus 1.299), as expected when
+sampling destroys temporal persistence. This is an illustrative diagnostic,
+not a direct test of the renewal model.

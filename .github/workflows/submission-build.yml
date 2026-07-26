@@ -1,0 +1,109 @@
+name: Submission build
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - agent/submission-ready-final
+    paths:
+      - "paper/*.tex"
+      - "paper/**/*.tex"
+      - "paper/references.bib"
+      - "experiments/**.py"
+      - "tools/**.py"
+      - "requirements.txt"
+      - "Makefile"
+      - ".github/workflows/submission-build.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+      - name: Run full unit-test suite
+        run: make test
+      - name: Reproduce complete synthetic experiment suite
+        run: make experiments
+      - name: Reproduce real sequential validation
+        run: PYTHONPATH=experiments python experiments/real_sequential.py --output-dir results/real_sequential
+      - name: Regenerate paper figures with real-data results
+        run: PYTHONPATH=experiments python experiments/paper_figures.py
+      - name: Generate completed AAAI reproducibility checklist
+        run: >-
+          python tools/build_checklist.py
+          --template AAAI_AuthorKit27/ReproducibilityChecklist.tex
+          --output paper/reproducibility_checklist.tex
+      - name: Stage official AAAI style files for compilation
+        run: |
+          cp AAAI_AuthorKit27/aaai2027.sty paper/
+          cp AAAI_AuthorKit27/aaai2027.bst paper/
+      - name: Compile official-format main paper
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: paper
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+      - name: Compile technical supplement
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: supplement.tex
+          working_directory: paper
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+      - name: Compile reproducibility checklist
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: reproducibility_checklist.tex
+          working_directory: paper
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+      - name: Install PDF audit tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Audit submission artifacts
+        run: python tools/audit_submission.py --paper-dir paper --output results/final_audit/build_report.json
+      - name: Remove transient copied style files
+        run: rm -f paper/aaai2027.sty paper/aaai2027.bst
+      - name: Commit reproducible release artifacts
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          git add -f \
+            paper/main.pdf \
+            paper/supplement.pdf \
+            paper/reproducibility_checklist.pdf \
+            paper/reproducibility_checklist.tex \
+            paper/figures/theory_summary.pdf \
+            paper/figures/validation_summary.pdf \
+            results/real_sequential \
+            results/final_audit/build_report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Build audited submission artifacts"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+      - name: Upload submission bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission-bundle
+          path: |
+            paper/main.pdf
+            paper/supplement.pdf
+            paper/reproducibility_checklist.pdf
+            results/final_audit/build_report.json
+            results/real_sequential
+          if-no-files-found: error
+          retention-days: 14
