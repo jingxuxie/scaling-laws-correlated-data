@@ -1,4 +1,5 @@
 PYTHON ?= python
+AAAI_KIT ?= ../AAAI_AuthorKit27
 
 .PHONY: all experiments test paper supplement clean
 
@@ -18,11 +19,11 @@ test:
 	PYTHONPATH=experiments $(PYTHON) -m unittest discover -s experiments -p 'test_*.py' -v
 
 paper:
-	cd paper && latexmk -e '$$bibtex = q/bibtex.original %O %B/' -pdf -interaction=nonstopmode -halt-on-error main.tex
+	cd paper && TEXINPUTS=".:$(AAAI_KIT):" BSTINPUTS=".:$(AAAI_KIT):" latexmk -e '$$bibtex = q/bibtex.original %O %B/' -pdf -interaction=nonstopmode -halt-on-error main.tex
 	$(MAKE) supplement
 
 supplement:
-	cd paper && latexmk -pdf -interaction=nonstopmode -halt-on-error supplement.tex
+	cd paper && TEXINPUTS=".:$(AAAI_KIT):" BSTINPUTS=".:$(AAAI_KIT):" latexmk -pdf -interaction=nonstopmode -halt-on-error supplement.tex
 
 clean:
 	cd paper && latexmk -C main.tex && latexmk -C supplement.tex
