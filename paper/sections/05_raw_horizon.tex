@@ -1,20 +1,25 @@
 \section{From Innovations to Raw Trajectories}
+\label{sec:raw-horizon}
 
-The exact identity counts completed innovations. We next observe exactly $N$
-raw examples from integer-duration blocks. Let $\widehat\theta^{(N)}$ memorize
-each noiseless mode encountered before time $N$.
+The exact identity counts completed innovations, whereas a logged dataset is
+usually specified by its number of raw observations.  We therefore concatenate
+integer-duration blocks and stop after exactly $N$ examples.  In the noiseless
+case, seeing any part of a block reveals its spectral coordinate, so let
+$\widehat\theta^{(N)}$ memorize every modeled mode encountered by time $N$.
+The number of renewals before $N$ may fluctuate strongly when dwell times are
+heavy tailed; our proof avoids replacing it by its expectation.
 
 \begin{theorem}[Raw horizon and inspection paradox]
 \label{thm:raw}
 Assume Equation~\eqref{eq:power-laws}, $\sigma=0$, and
-$1<b<a+r+1$. If the stream starts at a renewal boundary, then for every
+$1<b<a+r+1$.  If the stream starts at a renewal boundary, then for every
 $r\ge0$,
 \begin{equation}
 \E\risk(\widehat\theta^{(N)},\theta)
 \asympconst M^{-(b-1)}+N^{-(b-1)/(a+r)}.
 \label{eq:raw-boundary}
 \end{equation}
-No finite-variance dwell assumption is needed. Under stationary equilibrium
+No finite-variance dwell assumption is needed.  Under stationary equilibrium
 initialization, for $r>0$,
 \begin{align}
 \E\risk(\widehat\theta^{(N)}_{\rm eq},\theta)
@@ -22,31 +27,50 @@ initialization, for $r>0$,
 &+N^{-(a-1)/r}.
 \label{eq:raw-stationary}
 \end{align}
-For $r=0$, the last term is absent.
+For $r=0$, the final term is absent.
 \end{theorem}
 
-For mode $j$, let $H_j$ be the raw start time of its first block. A geometric
-failure calculation gives
+\paragraph{Mode-wise hitting times.}
+For mode $j$, let $H_j$ be the raw start time of its first block.  The number
+of failed innovations before the first $j$-block is geometric.  Conditioning
+the dwell distribution on failure gives the elementary sandwich
 \begin{align}
 \E H_j&=\mu/q_j-\tau_j\le\mu/q_j,\nonumber\\
 (1-q_j)^N&\le\Prob(H_j\ge N)
 \le\min\{1,\mu/(Nq_j)\}.
 \label{eq:hitting-sandwich}
 \end{align}
-Summing against $s_j$ at $j\asymp N^{1/(a+r)}$ proves
-Equation~\eqref{eq:raw-boundary}. In equilibrium, the initial block is
-size-biased. Its residual life $R$ obeys
-$\Prob(R\ge N)\asymp N^{-(a-1)/r}$, producing the additional term in
-Equation~\eqref{eq:raw-stationary}. This is a genuine inspection-paradox phase,
-not a finite-sample constant.
+The upper bound is Markov's inequality applied separately to each mode; the
+lower bound observes that at most $N$ blocks can start in $N$ raw steps.
+Summing the sandwich against $s_j$ at the critical index
+$j\asymp N^{1/(a+r)}$ proves Equation~\eqref{eq:raw-boundary}.  This argument is
+stronger than concentrating the total renewal count: it remains valid even
+when the duration variance is infinite.
 
-Noise can be transferred without requiring $\E\tau_J^2<\infty$. Let
+\paragraph{Why stationarity is different.}
+At equilibrium, the block containing time zero is selected in proportion to
+its length, so its mode has law $\lambda$ rather than $q$.  Conditional on
+mode $j$, its forward residual life $R$ is uniform on
+$\{1,\ldots,\tau_j\}$.  Consequently,
+\begin{equation}
+\Prob(R\ge N)\asympconst N^{-(a-1)/r}.
+\label{eq:residual-tail-main}
+\end{equation}
+On the event $R\ge N$, no refresh occurs in the entire observation window.
+This creates the additional term in Equation~\eqref{eq:raw-stationary}.  The
+overall stationary slope is therefore the slower of the innovation exponent
+$(b-1)/(a+r)$ and the residual-life exponent $(a-1)/r$.  In particular, the
+starting convention is not merely a finite-sample detail for heavy dwell
+profiles.
+
+\paragraph{Noisy horizons from fractional moments.}
+Noise can also be transferred without requiring $\E\tau_J^2<\infty$.  Let
 $D=\tau_J$ for $J\sim q$ and $\beta=(b-1)/(a+r)$.
 
 \begin{theorem}[Noisy raw horizons from fractional moments]
 \label{thm:noisy-raw}
 Let $1<b\le a+r$, $\sigma=O(1)$, and restrict estimates to the first $M$
-modes. Set $B_N=\lfloor N/(2\mu)\rfloor$. If $r=0$, or if
+modes.  Set $B_N=\lfloor N/(2\mu)\rfloor$.  If $r=0$, or if
 \begin{equation}
 \frac{b-1}{a+r}<\frac{a-1}{r},
 \label{eq:fractional-condition}
@@ -58,26 +82,20 @@ then, over the signed class $\Theta_s$ of Theorem~\ref{thm:minimax},
 \asympconst M^{-(b-1)}+N^{-\beta}.
 \label{eq:noisy-raw-rate}
 \end{equation}
-The upper bound is attained by using the first $B_N$ completed blocks when
-they fit in the horizon and outputting zero otherwise.
+The upper bound uses the first $B_N$ completed blocks when they fit in the
+horizon and outputs zero otherwise.
 \end{theorem}
 
-For $r>0$, $\E D^\nu<\infty$ exactly for
-$\nu<1+(a-1)/r$. Under Equation~\eqref{eq:fractional-condition}, choose
-$1+\beta<\nu\le2$ below this threshold. The von Bahr--Esseen inequality gives
-$\Prob(\sum_{k\le B_N}D_k>N)=O(N^{1-\nu})=o(N^{-\beta})$. On the completion
-event, Theorem~\ref{thm:scaling} applies with $B_N\asymp N$; its variance term
-is absorbed when $b\le a+r$. The unseen-sign prior from
-Theorem~\ref{thm:minimax} gives the matching lower bound. This strictly extends
-the finite-variance range $r<a-1$.
-
-Finally, a reversible Markov realization on states $(j,s)$ refreshes at rate
-$\tau_j^{-1}$ and otherwise stays put. Its stationary law is
-$\lambda_j/2$, and
+For $r>0$, $\E D^\nu<\infty$ exactly when
+$\nu<1+(a-1)/r$.  Under Equation~\eqref{eq:fractional-condition}, choose
+$1+\beta<\nu\le2$ below this threshold.  The von Bahr--Esseen inequality gives
 \begin{equation}
-\E[X_tX_{t+\ell}^\top]
-=\sum_j\lambda_j(1-\tau_j^{-1})^\ell e_je_j^\top.
-\label{eq:nonseparable-cov}
+\Prob\!\left(\sum_{k\le B_N}D_k>N\right)
+=O(N^{1-\nu})=o(N^{-\beta}).
+\label{eq:completion-probability}
 \end{equation}
-Different modes carry different temporal kernels, so the covariance is
-nonseparable unless all $\tau_j$ coincide.
+On the completion event, Theorem~\ref{thm:scaling} applies with
+$B_N\asymp N$; its variance term is absorbed when $b\le a+r$.  The unseen-sign
+prior gives the matching lower bound.  The result strictly extends the
+finite-variance range $r<a-1$ and separates the moment condition needed for
+noisy averaging from the weaker condition needed for noiseless coverage.

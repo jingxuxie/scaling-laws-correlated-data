@@ -1,39 +1,67 @@
 \section{Spectral Renewal Regression}
 
-Let $(e_j)_{j\ge1}$ be orthonormal. A fresh test example is
+\paragraph{Marginal prediction problem.}
+Let $(e_j)_{j\ge1}$ be an orthonormal spectral basis.  A fresh test example is
 \begin{equation}
-X=Se_J,\quad \Prob(J=j)=\lambda_j,\quad
-\Prob(S=\pm1)=\tfrac12,
+X=Se_J,
+\qquad \Prob(J=j)=\lambda_j,
+\qquad \Prob(S=\pm1)=\tfrac12,
 \label{eq:test-law}
 \end{equation}
-where $\lambda_j>0$ and $\sum_j\lambda_j=1$. For target $\theta$, the label is
-$Y=\langle X,\theta\rangle+\eps$. Prediction risk is
+where $\lambda_j>0$ and $\sum_j\lambda_j=1$.  For a target
+$\theta=(\theta_j)_j$, the label is $Y=\langle X,\theta\rangle+\eps$.
+The population excess prediction risk is diagonal in this basis:
 \begin{equation}
 \risk(\widehat\theta,\theta)
 =\sum_{j\ge1}\lambda_j(\widehat\theta_j-\theta_j)^2,
 \qquad s_j:=\lambda_j\theta_j^2.
 \label{eq:risk-source}
 \end{equation}
-Associate mode $j$ with dwell weight $\tau_j\ge1$, define
+The quantity $s_j$ is the predictive energy carried by mode $j$.  Importantly,
+all temporal processes considered below have this same one-time test law.
+
+\paragraph{Persistent training stream.}
+Associate mode $j$ with a dwell weight $\tau_j\ge1$.  Define
 \begin{equation}
-Z:=\sum_j\lambda_j/\tau_j,\qquad
-q_j:=\frac{\lambda_j/\tau_j}{Z},\qquad \mu:=Z^{-1},
+Z:=\sum_j\frac{\lambda_j}{\tau_j},
+\qquad
+q_j:=\frac{\lambda_j/\tau_j}{Z},
+\qquad
+\mu:=Z^{-1}.
 \label{eq:q-def}
 \end{equation}
-and draw $B$ independent innovation blocks $J_k\sim q$. Block $k$ has sign
-$S_k$ and provides the average
+Training is first described at renewal times.  For each of $B$ independent
+innovation blocks, draw a mode $J_k\sim q$, draw a Rademacher sign $S_k$, and
+observe the block average
 \begin{align}
 \overline Y_k&=S_k\theta_{J_k}+\overline\eps_k,
 &\E[\overline\eps_k\mid J_k=j]&=0,\nonumber\\
 &&\E[\overline\eps_k^2\mid J_k=j]&=\sigma^2/\tau_j.
 \label{eq:block-observation}
 \end{align}
-For integer $\tau_j$, this is the average of $\tau_j$ repeated noisy labels.
-Since $q_j\tau_j/\mu=\lambda_j$, expanding blocks into raw observations leaves
-the one-time covariance unchanged.
+For integer $\tau_j$, this is exactly the average of $\tau_j$ repeated labels
+with independent variance-$\sigma^2$ noise.  Expanding every block into its raw
+observations gives mean block length
+$\sum_jq_j\tau_j=\mu$ and time occupancy
+\begin{equation}
+\frac{q_j\tau_j}{\mu}=\lambda_j.
+\label{eq:occupancy-main}
+\end{equation}
+Thus changing $\tau$ reorganizes the stream temporally without changing its
+marginal covariance.  The number $B$ counts statistically new refreshes; the
+raw observation count $N$ is analyzed separately in the raw-trajectory
+analysis below.
 
-Let $K_j=\sum_{k\le B}\1\{J_k=j\}$. For a model restricted to the first $M$
-modes, use
+Equation~\eqref{eq:q-def} is the central modeling constraint.  If a direction
+occupies a fixed fraction $\lambda_j$ of time but each visit lasts longer, then
+new visits to that direction must occur less often.  Uniform dwell times give
+$q=\lambda$ up to normalization.  Mode-dependent dwell times tilt the
+innovation law toward rapidly refreshing directions.
+
+\paragraph{Estimator.}
+Let
+$K_j=\sum_{k\le B}\1\{J_k=j\}$ be the number of blocks in mode $j$.  A model of
+size $M$ retains the first $M$ modes and uses the sufficient-statistic average
 \begin{equation}
 \widehat\theta_j=
 \begin{cases}
@@ -43,13 +71,38 @@ K_j^{-1}\sum_{k:J_k=j}S_k\overline Y_k,&K_j>0,\\
 \quad j\le M,
 \label{eq:estimator}
 \end{equation}
-with $\widehat\theta_j=0$ for $j>M$.
+with $\widehat\theta_j=0$ for $j>M$.  The estimator can be implemented online
+with one count and one running mean per represented mode.  In the noiseless
+case, a single visit reveals a coordinate exactly; all remaining error comes
+from model truncation or modes that never arrived.  This makes the information
+bottleneck transparent and permits an exact minimax characterization.
 
-\paragraph{Dense representations.}
+\paragraph{Power-law instance.}
+Our principal asymptotic regime assumes
+\begin{equation}
+\lambda_j\asympconst j^{-a},
+\qquad
+\tau_j\asympconst j^r,
+\qquad
+s_j\asympconst j^{-b},
+\label{eq:power-laws}
+\end{equation}
+with $a>1$, $r\ge0$, and $b>1$.  The marginal exponent $a$ describes the task
+geometry, $r$ describes spectral persistence, and $b$ describes target
+regularity.  From Equation~\eqref{eq:q-def},
+$q_j\asymp j^{-p}$ with the \emph{persistence-adjusted exponent}
+\begin{equation}
+p:=a+r.
+\label{eq:p-definition}
+\end{equation}
+The theory below is stated with two-sided regular variation, not only exact
+Zipf normalizations.
+
+\paragraph{Dense observed features.}
 The coordinate notation is a latent basis, not a requirement that observed
-vectors be sparse. Let $V\in\R^{D\times D}$ be invertible with rows $v_j^\top$,
-and observe $X=Sv_J$. Labels are $S\theta_J$, so the ambient teacher is
-$w^\star=V^{-1}\theta$.
+vectors be sparse.  Let $V\in\R^{D\times D}$ be invertible with rows
+$v_j^\top$, and observe $X=Sv_J$.  Labels are $S\theta_J$, so the ambient
+teacher is $w^\star=V^{-1}\theta$.
 
 \begin{proposition}[Representation invariance]
 \label{prop:dense}
@@ -65,6 +118,8 @@ $mI\preceq VV^\top\preceq LI$, the ordered eigenvalues of
 $\Sigma=V^\top\operatorname{diag}(\lambda)V$ obey
 $m\lambda_j\le\lambda_j(\Sigma)\le L\lambda_j$.
 \end{proposition}
-The proof is a change of coordinates plus the min--max principle. Thus a known,
-uniformly well-conditioned dense representation preserves both exact risk and
-the marginal spectral exponent.
+The proof is a change of coordinates followed by eigenvalue monotonicity under
+Loewner order.  Hence a known, uniformly well-conditioned dense representation
+preserves both exact risk and the marginal spectral exponent.  The
+experiments below also test an ambient minimum-norm learner that is not given
+the latent decoder.

@@ -1,61 +1,92 @@
 \section{Introduction}
 
 Scaling laws turn small experiments into forecasts of how loss changes with
-model size, data, and compute. They are now central to resource planning in
-large-scale learning \cite{kaplan2020scaling,hoffmann2022training}, while
-spectral theories explain power laws through the progressive resolution of
-weaker covariance or kernel modes
-\cite{bordelon2020spectrum,bahri2024explaining,lin2024scaling}. Nearly all such
-theories begin with independent examples. Real datasets, however, are often
-contiguous trajectories: robot logs, sensor streams, financial histories, and
-replay buffers.
+model size, data, and compute.  Empirical power laws have been observed across
+vision, language, speech, and generative modeling
+\cite{hestness2017deep,rosenfeld2020constructive,kaplan2020scaling,hoffmann2022training},
+while spectral theories explain many such curves through the progressive
+resolution of weaker covariance or kernel modes
+\cite{sollich1998learning,bordelon2020spectrum,canatar2021spectral,bahri2024explaining,lin2024scaling}.
+These results support a useful planning picture: more data reveals increasingly
+fine predictive structure, and the unresolved tail determines the learning
+slope.
 
-A standard correction replaces the nominal sample count by a scalar effective
-sample size. This is sensible when every feature direction shares one temporal
-kernel. It is incomplete when the weak directions that dominate late-stage
-learning are also the slowest to refresh. Then information arrives at a
-\emph{spectrum} of rates. We ask:
+Most scaling-law theories formalize this picture with independent examples.
+Yet many high-value datasets are contiguous trajectories: robot experience,
+physical and environmental sensors, financial histories, user-interaction
+logs, and replay buffers.  A common practical correction replaces the nominal
+sample count $N$ by a scalar effective sample size $N_{\rm eff}$ computed from
+a global mixing time or integrated autocorrelation.  This is appropriate when
+all feature directions share one temporal kernel.  It can be misleading when
+the directions that dominate late-stage learning are also the slowest to
+refresh.
+
+Consider two streams with exactly the same one-time covariance spectrum.  In
+the first, every spectral direction persists for the same duration.  In the
+second, high-index directions are individually weak but occur in long bursts.
+A global average can assign the two streams the same autocorrelation time.
+Nevertheless, late directions arrive much less often in the second stream, so
+the number of observations needed to discover them grows with their index.
+The relevant object is then not one effective sample count but a sequence of
+mode-wise information rates.  This motivates our central question:
 \begin{quote}
 \emph{When does dependence change a scaling exponent, rather than only a
 constant?}
 \end{quote}
 
-We isolate the mechanism in an exactly solvable model. Mode $j$ occupies a
-fraction $\lambda_j$ of raw time but lasts $\tau_j$ steps whenever it appears.
-Preserving the same one-time covariance forces new blocks to choose mode $j$
-with probability
+We answer this question in an exactly solvable persistent regression model.
+Mode $j$ occupies a fraction $\lambda_j$ of raw time but lasts $\tau_j$ steps
+whenever it appears.  Preserving the same one-time covariance forces a new
+block to choose mode $j$ with probability
 \begin{equation}
 q_j=\frac{\lambda_j/\tau_j}{\sum_\ell\lambda_\ell/\tau_\ell}.
 \label{eq:intro-q}
 \end{equation}
-Thus the marginal spectrum is $\lambda$, whereas the \emph{innovation
-spectrum} is $q$. If $\lambda_j\asymp j^{-a}$ and
-$\tau_j\asymp j^r$, then $q_j\asymp j^{-(a+r)}$. After $B$ innovations, the
+Thus $\lambda$ is the \emph{marginal spectrum}, while $q$ is the
+\emph{innovation spectrum}: it measures the arrival of statistically new
+spectral information.  If $\lambda_j\asymp j^{-a}$ and
+$\tau_j\asymp j^r$, then $q_j\asymp j^{-(a+r)}$.  After $B$ innovations, the
 largest mode seen with constant probability is
-$J_B\asymp B^{1/(a+r)}$; unresolved target energy
-$s_j\asymp j^{-b}$ therefore contributes
-$B^{-(b-1)/(a+r)}$.
+$J_B\asymp B^{1/(a+r)}$.  If target energy satisfies
+$s_j=\lambda_j\theta_j^2\asymp j^{-b}$, the unresolved tail is
+\begin{equation}
+\sum_{j>J_B}s_j\asymp B^{-(b-1)/(a+r)}.
+\label{eq:intro-mechanism}
+\end{equation}
+This simple coverage mechanism changes the slope while leaving the marginal
+prediction problem unchanged.
 
-Our contributions are:
+Our contributions are as follows.
 \begin{enumerate}
 \item We define \emph{spectral renewal regression} and derive an exact
-finite-sample bias--variance identity. Under power laws, it yields matching
-model, innovation, and noise terms.
-\item We prove an exact noiseless minimax equality: no optimizer or data-reuse
-strategy can identify the sign of a mode that never arrived.
-\item We pass from innovations to exactly $N$ raw examples without a
-finite-variance assumption. Boundary initialization retains the innovation
-exponent for every $r\ge0$, while equilibrium initialization can enter a new
-inspection-paradox phase.
-\item Using the von Bahr--Esseen inequality, we obtain a noisy raw-horizon rate
-under fractional, rather than second, dwell moments. This covers substantial
-infinite-variance regimes.
-\item We show that the theorem is invariant under known well-conditioned dense
-representations. Synthetic and real-data tests verify the predicted regimes
-and, importantly, show that dense autoregressive correlation without an
-innovation bottleneck need not obey the $a+r$ law.
+finite-sample decomposition into model approximation, unseen-mode bias, and
+label-noise variance.  Under power laws, all three terms have matching upper
+and lower rates.
+\item We prove an exact noiseless minimax equality over a signed source class.
+No optimizer, number of epochs, or data-reuse strategy can infer the sign of a
+predictive mode that never arrived.
+\item We give a direct counterexample to scalar effective sample size.  Two
+stationary streams have the same marginal covariance and the same trace
+integrated autocorrelation time, yet have exponents $(b-1)/a$ and
+$(b-1)/(a+r)$.  We then derive the sample- and compute-optimal consequences of
+the mode-wise law.
+\item We pass from a fixed number of innovations to exactly $N$ raw examples.
+At a renewal boundary, the innovation exponent holds for every $r\ge0$
+without a finite-variance dwell assumption.  Under stationary initialization,
+a size-biased initial block can create a separate inspection-paradox phase.
+\item Using the von Bahr--Esseen inequality, we transfer the noisy hard-target
+rate under fractional, rather than second, dwell moments.  This covers
+substantial infinite-variance regimes.
+\item We prove invariance under known well-conditioned dense representations
+and deliberately test the boundary of the theory.  Dense-dictionary
+regression retains the predicted slopes, while a dense Gaussian
+autoregressive negative control does not: autocorrelation alone is not enough
+when every sample contains every mode.
 \end{enumerate}
 
-The last point delimits the claim: autocorrelation by itself is not enough. The
-exponent changes when dependence throttles the arrival of new predictive
-spectral information.
+The distinction in the last item is important.  We do not claim that arbitrary
+nonseparable time series universally replace $a$ by $a+r$.  The exponent
+changes when persistence limits the arrival of new predictive spectral
+information.  This narrower claim is both provable and operational: it suggests
+estimating the persistence-adjusted spectrum $\lambda_j/\tau_j$, rather than
+correcting all directions by one global mixing time.

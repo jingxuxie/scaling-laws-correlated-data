@@ -1,35 +1,90 @@
 \section{Related Work}
 
-\paragraph{Spectral scaling laws.}
-Empirical neural scaling laws were documented by \citet{kaplan2020scaling} and
-refined for compute-optimal training by \citet{hoffmann2022training}.
-Eigenvalue-based theories connect learning curves to spectral resolution
-\cite{bordelon2020spectrum,maloney2022solvable,bahri2024explaining}; feature
-learning can alter these rates beyond the kernel regime
-\cite{bordelon2024feature}. Our closest starting point is the
-infinite-dimensional sketched linear model of \citet{lin2024scaling}, which
-derives parameter--data laws for one-pass SGD. \citet{lin2025reuse} studies
-multi-pass reuse. We instead hold the marginal task fixed and change the rate
-at which distinct spectral modes arrive. Repeating a persistent block can
-reduce optimization error but cannot reveal an absent mode.
+\paragraph{Empirical and functional scaling laws.}
+Early large-scale studies reported predictable power-law learning curves and
+sublinear growth of the model size needed to exploit additional data
+\cite{hestness2017deep}.  Subsequent work proposed joint functional forms for
+model and dataset scaling \cite{rosenfeld2020constructive}, established
+parameter--data--compute laws for language modeling
+\cite{kaplan2020scaling,hoffmann2022training}, and documented transitions that
+require smoothly broken rather than single power laws
+\cite{caballero2023broken}.  These papers treat scaling primarily as an
+empirical regularity to be fitted and extrapolated.  Our aim is complementary:
+we construct two data streams with the same marginal task and identify a
+specific temporal mechanism that changes the exponent itself.
 
-\paragraph{Regression with dependent samples.}
-Markovian least squares and stochastic optimization are commonly characterized
-through global mixing quantities
-\cite{nagaraj2020markovian,doan2020finite,sun2025single}. In proportional
-high-dimensional limits, \citet{atanasov2025correlated} derive sharp ridge
-formulas for matrix-Gaussian samples with a shared sample-correlation operator,
-while \citet{moniri2025dependent} establish Gaussian universality for broad
-linearly dependent processes. Our question is different: feature direction
-$j$ has its own refresh time $\tau_j$, and the alignment of this temporal
-hierarchy with the marginal spectrum is what changes the exponent.
+\paragraph{Spectral learning curves.}
+Learning curves for Gaussian processes and kernel regression have long been
+expressed through covariance-operator eigenvalues
+\cite{sollich1998learning,bordelon2020spectrum}.  Task--kernel alignment further
+shows that generalization depends on how target energy is distributed across
+those eigenfunctions \cite{canatar2021spectral}.  Solvable random-feature and
+statistical-mechanics models connect power-law spectra to neural scaling
+\cite{maloney2022solvable,bahri2024explaining}, while feature learning can
+change optimization and compute exponents beyond the fixed-kernel regime
+\cite{bordelon2024feature}.  These analyses share the idea that a sample budget
+resolves progressively weaker modes.  We add a second spectral object: the
+innovation law $q_j\propto\lambda_j/\tau_j$, which determines how quickly each
+mode receives statistically new observations.
 
-\paragraph{Occupancy and renewal theory.}
-At innovation times, the problem is an infinite-urn scheme with frequencies
-$q_j$. Missing-mass asymptotics under regular variation are classical
-\cite{gnedin2007occupancy,benhamou2017concentration}. Our loss is a
-\emph{target-weighted} missing mass: unseen mode $j$ costs $s_j$, whose exponent
-need not match $q_j$. For raw horizons, heavy dwell times introduce the renewal
-inspection paradox. Our noisy transfer uses the fractional-moment inequality
-of \citet{vonbahr1965inequalities}, avoiding an unnecessary finite-variance
-assumption.
+\paragraph{Scaling laws in linear regression.}
+Our closest starting point is the sketched infinite-dimensional linear model
+of \citet{lin2024scaling}, which derives joint model, data, and compute laws for
+one-pass SGD under a power-law covariance spectrum.  \citet{lin2025reuse}
+show that multi-pass reuse can improve the iteration term under a source
+condition.  Recent extensions study mini-batch sampling protocols
+\cite{chen2026minibatch} and optimizer-specific effects such as signSGD
+\cite{kim2026signsgd}.  In all of these works, the distinctive resource is
+optimization over a fixed collection of examples drawn from the same marginal
+law.  Our bottleneck is orthogonal: repeated optimization can reduce error on
+observed directions but cannot identify a direction that has not refreshed.
+The resulting data term is a target-weighted coverage law.
+
+Rare or sparse features provide another route to coverage-limited scaling.
+\citet{sous2026sparse} study sparse activations and show that unobserved
+coordinates can induce asymmetric exponents and double descent.  Their
+sparsity changes which features appear in an individual input.  We instead
+hold the one-time covariance distribution fixed across persistence profiles
+and change only temporal organization.  This lets us compare streams with the
+same marginal spectrum, and even the same global integrated autocorrelation,
+while obtaining different learning slopes.
+
+\paragraph{Learning from dependent observations.}
+Classical and modern analyses often quantify dependence through a scalar
+mixing time, spectral gap, or variance-inflation factor.  Examples include
+concentration for Markov chains \cite{fan2021hoeffding}, finite-time SGD under
+Markov randomness \cite{doan2020finite}, and least squares from a single
+trajectory \cite{nagaraj2020markovian,sun2025single}.  Generalization bounds
+have also been developed through delayed or Wasserstein-stability
+online-to-batch reductions
+\cite{abeles2025mixing,chatterjee2025dependent}, while consistency results for
+kernel methods permit broad non-i.i.d. processes
+\cite{massiani2024dependent}.  These theories provide guarantees in terms of
+global process descriptors; they do not ask how dependence aligned with an
+infinite predictive spectrum changes a scaling exponent.
+
+Sharp high-dimensional regression results address a different but related
+limit.  \citet{atanasov2025correlated} analyze ridge regression with a shared
+sample-correlation operator and derive corrected risk and cross-validation
+formulas.  \citet{moniri2025dependent} prove Gaussian universality for broad
+linearly dependent designs in a proportional regime.  Their spatio-temporal
+models are dense: each observation contains all coordinates, and dependence
+primarily changes sample-covariance fluctuations.  Our exact theorem concerns
+innovation coverage, where different predictive directions refresh at
+different rates.  The dense Gaussian autoregressive experiment reported below is included
+precisely to show that these settings need not share an exponent.
+
+\paragraph{Occupancy, renewal, and effective sample size.}
+At refresh times, spectral renewal regression is an infinite-urn scheme with
+frequencies $q_j$.  Occupancy and missing-mass asymptotics under regular
+variation originate in work such as \citet{karlin1968urn} and are developed in
+modern form by \citet{gnedin2007occupancy} and
+\citet{benhamou2017concentration}.  Our risk is a \emph{target-weighted}
+missing mass: an unseen mode has cost $s_j$, whose exponent can differ from the
+occupancy frequencies.  At raw time horizons, size-biased dwell lengths
+produce the renewal inspection paradox.  Our noisy transfer uses the
+fractional-moment inequality of \citet{vonbahr1965inequalities}.  Finally, the
+matched-autocorrelation construction uses integrated autocorrelation time in
+the sense of Markov-chain variance inflation \cite{geyer1992practical}, but
+shows that averaging over modes can erase the alignment information needed to
+predict the learning curve.

@@ -1,0 +1,56 @@
+{
+  "compute": {
+    "0.0": {
+      "fit_end_budget": 1073741824,
+      "fit_start_budget": 16777216,
+      "fitted_innovation_exponent": 0.670531854455638,
+      "fitted_model_exponent": 0.32946967967086865,
+      "fitted_risk_exponent": 0.2665723578407695,
+      "predicted_innovation_exponent": 0.6666666666666666,
+      "predicted_model_exponent": 0.3333333333333333,
+      "predicted_risk_exponent": 0.26666666666666666,
+      "r": 0.0
+    },
+    "0.4": {
+      "fit_end_budget": 1073741824,
+      "fit_start_budget": 16777216,
+      "fitted_innovation_exponent": 0.7052129787038858,
+      "fitted_model_exponent": 0.2947871748522963,
+      "fitted_risk_exponent": 0.23516003014291595,
+      "predicted_innovation_exponent": 0.7058823529411765,
+      "predicted_model_exponent": 0.29411764705882354,
+      "predicted_risk_exponent": 0.23529411764705885,
+      "r": 0.4
+    },
+    "0.8": {
+      "fit_end_budget": 1073741824,
+      "fit_start_budget": 16777216,
+      "fitted_innovation_exponent": 0.7369836456907508,
+      "fitted_model_exponent": 0.26301723764139767,
+      "fitted_risk_exponent": 0.21035620242427622,
+      "predicted_innovation_exponent": 0.7368421052631579,
+      "predicted_model_exponent": 0.2631578947368421,
+      "predicted_risk_exponent": 0.2105263157894737,
+      "r": 0.8
+    }
+  },
+  "matched_ess": {
+    "a": 2.0,
+    "aligned_fitted_exponent": 0.2840195128097632,
+    "aligned_mean_block_length": 3.1043797920287566,
+    "aligned_predicted_exponent": 0.28571428571428575,
+    "aligned_scale": 2.3534433540452353,
+    "aligned_trace_iat": 15.0,
+    "b": 1.8,
+    "fit_end_horizon": 262144,
+    "fit_start_horizon": 8192,
+    "model_size": 65536,
+    "r": 0.8,
+    "trace_iat_target": 15.0,
+    "trials": 300,
+    "uniform_fitted_exponent": 0.4007470131460766,
+    "uniform_mean_block_length": 8.0,
+    "uniform_predicted_exponent": 0.4,
+    "uniform_trace_iat": 15.0
+  }
+}

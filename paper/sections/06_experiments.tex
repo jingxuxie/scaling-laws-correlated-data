@@ -1,7 +1,10 @@
 \section{Experiments}
+\label{sec:experiments}
 
-All experiments use direct summation or lightweight Monte Carlo and run on a
-laptop. Code, seeds, exact output tables, and tests are included.
+All calculations use direct summation or lightweight Monte Carlo and run on a
+laptop.  Code, seeds, exact CSV/JSON outputs, and deterministic tests are
+included.  Slopes are fit only on the largest scales specified before
+inspection; local slopes and standard errors are retained in the repository.
 
 \begin{figure*}[t]
 \centering
@@ -16,22 +19,38 @@ the stationary heavy-dwell phase.}
 \label{fig:theory-summary}
 \end{figure*}
 
-\paragraph{Exact and raw-horizon rates.}
+\paragraph{Exact, raw-horizon, and matched-ESS rates.}
 For $(a,b)=(2,1.8)$ and $r\in\{0,0.4,0.8\}$, exact finite-$B$ slopes are
 $-0.399999$, $-0.333333$, and $-0.285714$, versus predictions $-0.4$, $-1/3$,
-and $-2/7$. Independent block Monte Carlo differs from the exact identity by
-at most 2.1\%. Streams stopped after exactly $N$ raw examples give
-$-0.399$, $-0.339$, and $-0.290$. In an infinite-variance setting
-$(a,b,r)=(2,5.5,3)$, the boundary-start slope is $-0.895$ versus $-0.9$;
-stationary initialization slows it to $-0.346$, close to the inspection
-prediction $-1/3$.
+and $-2/7$.  Independent block Monte Carlo differs from the exact identity by
+at most 2.1\%.  Streams stopped after exactly $N$ raw examples give
+$-0.399$, $-0.339$, and $-0.290$.
 
-\paragraph{Noise and model choice.}
-Exact evaluation of the reciprocal-binomial term confirms both regimes. For a
-hard target $(a,b,r)=(2,1.8,0.8)$, the fitted risk and frontier-model exponents
-are $0.284$ and $0.354$ versus $2/7$ and $1/2.8$. For a smooth target $b=4$,
-optimizing over $M$ gives exponents $0.765$ for risk and $0.262$ for model size,
-versus $3/4$ and $1/4$.
+For Proposition~\ref{prop:matched-iat}, we set $a=2$, $r=0.8$, and calibrate
+both processes to trace IAT 15.  Three hundred stationary trajectories per
+scale give exponent $0.401$ under uniform persistence and $0.284$ under aligned
+persistence, versus $0.400$ and $0.286$.  Because the global IAT is identical,
+this experiment rules out a constant horizontal rescaling as an explanation
+of the gap.
+
+In an infinite-variance setting $(a,b,r)=(2,5.5,3)$, the boundary-start slope
+is $-0.895$ versus $-0.9$; stationary initialization slows it to $-0.346$,
+close to the inspection prediction $-1/3$.  The directly evaluated
+forward-recurrence tail has fitted exponent $0.332$.
+
+\paragraph{Noise, model choice, and compute allocation.}
+Exact evaluation of the reciprocal-binomial term confirms both noise regimes.
+For a hard target $(a,b,r)=(2,1.8,0.8)$, the fitted risk and frontier-model
+exponents are $0.284$ and $0.354$ versus $2/7$ and $1/2.8$.  For a smooth
+target $b=4$, optimizing over $M$ gives exponents $0.765$ for risk and $0.262$
+for model size, versus $3/4$ and $1/4$.
+
+We also minimize the exact noiseless risk under integer budgets $C=MB$.  For
+$r=0,0.4,0.8$, fitted compute exponents are $0.2666$, $0.2352$, and $0.2104$,
+matching $(b-1)/(a+r+1)=0.2667,0.2353,0.2105$.  The fitted model exponents are
+$0.329,0.295,0.263$, while the innovation exponents are
+$0.671,0.705,0.737$, confirming the allocation shift in
+Corollary~\ref{cor:compute-optimal}.
 
 \begin{figure*}[t]
 \centering
@@ -48,32 +67,41 @@ windows but not randomized subsets.}
 \end{figure*}
 
 \paragraph{Dense representation and negative control.}
-We rotate 512 latent modes into dense observed vectors. Exact decoding agrees
-with latent coverage risk within 1.4\% Monte Carlo error. A perturbed dictionary
-with condition number 4.67 and maximum row coherence 0.13 is deliberately more
-difficult: ambient minimum-norm fits give slopes $-0.398$ and $-0.275$ for
-$r=0$ and $0.8$, versus $-0.400$ and $-0.286$. By contrast, in the tested
-dense Gaussian AR regime, batch-regression slopes are $0.92$--$1.12$, far from
-renewal predictions $0.27$--$0.40$. In finite dimension, such Gaussian designs
-also have full column rank almost surely once $N\ge D$, hence noiseless least
-squares recovers exactly. The renewal exponent is therefore not a generic
-consequence of autocorrelation.
+We rotate 512 latent modes into dense observed vectors.  Exact decoding agrees
+with latent coverage risk within 1.4\% Monte Carlo error.  A perturbed
+dictionary with condition number 4.67 and maximum row coherence 0.13 is
+deliberately more difficult: ambient minimum-norm fits give slopes $-0.398$
+and $-0.275$ for $r=0$ and $0.8$, versus $-0.400$ and $-0.286$.  This tests a
+learner that is not supplied with the inverse representation used in
+Proposition~\ref{prop:dense}.
+
+By contrast, in the tested dense Gaussian AR regime, batch-regression slopes
+are $0.92$--$1.12$, far from renewal predictions $0.27$--$0.40$.  In finite
+dimension, such Gaussian designs have full column rank almost surely once
+$N\ge D$, hence noiseless least squares recovers exactly.  The control is
+therefore a deliberate attempt to falsify an overbroad interpretation: the
+renewal exponent is not a generic consequence of autocorrelation.
 
 \paragraph{Sequential appliance-energy data.}
 We use the 10-minute appliance-energy stream of
-\citet{candanedo2017appliances}. PCA gives empirical marginal masses
+\citet{candanedo2017appliances}.  PCA gives empirical marginal masses
 $\widehat\lambda_j$, ridge coefficients give target energies
 $\widehat s_j$, and each score has estimated integrated autocorrelation time
-$\widehat\tau_j$. We fit only an amplitude and scale on the first four sizes
-(128 through 1024), then extrapolate to the next three sizes (2048 through
-8192) with
+$\widehat\tau_j$ using the initial-positive-sequence estimator
+\cite{geyer1992practical}.  We fit only an amplitude and scale on the first
+four sizes (128 through 1024), then extrapolate to the next three sizes (2048
+through 8192) with
 \begin{equation}
-G_\rho(N)=\sum_j\widehat s_j e^{-cN\rho_j},\qquad
+G_\rho(N)=\sum_j\widehat s_j e^{-cN\rho_j},
+\qquad
 \rho_j\in\left\{\widehat\lambda_j,
 \widehat\lambda_j/\widehat\tau_j\right\}.
 \label{eq:real-proxy}
 \end{equation}
-For contiguous windows, log-RMSE falls from 1.099 to 0.951 (13.4\%). For random
-subsets, the spatial proxy is better (0.823 versus 1.299), as expected when
-sampling destroys temporal persistence. This is an illustrative diagnostic,
-not a direct test of the renewal model.
+For contiguous windows, out-of-range log-RMSE falls from 1.099 to 0.951
+(13.4\%).  For random subsets, the spatial proxy is better (0.823 versus
+1.299), as expected when sampling destroys temporal persistence.  The latter
+is a falsification control, not an inconvenient ablation: a genuinely temporal
+correction should lose its advantage after order is randomized.  This real
+experiment is an illustrative diagnostic rather than a direct test of the
+renewal generative model.

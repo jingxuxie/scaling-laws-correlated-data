@@ -14,31 +14,26 @@ For every $B,M\ge1$,
 \label{eq:exact-risk}
 \end{align}
 \end{theorem}
-The three terms are model approximation, unseen-mode bias, and label-noise
-variance. The identity follows by conditioning on $K_j$: if $K_j=0$ the mode
-costs $s_j$; otherwise its signed average is unbiased with variance
-$\sigma^2/(\tau_jK_j)$.
+The terms are, respectively, model approximation, unseen-mode bias, and
+label-noise variance.  The identity follows by conditioning on $K_j$: if
+$K_j=0$, mode $j$ costs $s_j$; otherwise the signed average is unbiased with
+variance $\sigma^2/(\tau_jK_j)$.  Unlike a generic upper bound, the expression
+retains the exact finite-sample dependence on every mode.
 
 The key count estimate is
 \begin{equation}
 qh_B(q)\asympconst \min\{Bq^2,B^{-1}\}.
 \label{eq:reciprocal-count}
 \end{equation}
-For $Bq\le1$, the event $K=1$ gives the lower bound and
-$h_B(q)\le\Prob(K>0)$ the upper. For $Bq\ge1$, a constant-probability event
-$1\le K\le2Bq$ gives the lower bound, while
-$1/K\le2/(K+1)$ and the binomial identity for $\E[(K+1)^{-1}]$ give the upper.
+When $Bq\ll1$, a coordinate is usually absent and the variance contribution is
+controlled by the rare event of one observation.  When $Bq\gg1$, inverse-count
+averaging contributes the usual $1/B$ scale.  This same transition determines
+the effective dimension of the variance term.
 
 \begin{theorem}[Persistent spectral scaling law]
 \label{thm:scaling}
-Assume
-\begin{equation}
-\lambda_j\asympconst j^{-a},\qquad
-\tau_j\asympconst j^r,\qquad
-s_j\asympconst j^{-b},
-\label{eq:power-laws}
-\end{equation}
-where $a>1$, $r\ge0$, and $b>1$. Put $p=a+r$. Uniformly for $B,M\ge2$,
+Assume Equation~\eqref{eq:power-laws} and put $p=a+r$.  Uniformly for
+$B,M\ge2$,
 \begin{equation}
 \boxed{
 \E\risk\asympconst
@@ -47,22 +42,67 @@ M^{-(b-1)}+B^{-(b-1)/p}
 \label{eq:block-scaling}
 \end{equation}
 \end{theorem}
-Indeed, $q_j\asymp j^{-p}$, so the critical mode is
-$J_B\asymp B^{1/p}$. Splitting each sum at $J_B$ proves
-Equation~\eqref{eq:block-scaling}; the supplement gives uniform upper and lower
-bounds. Uniform persistence has $r=0$ and preserves the usual exponent
-$(b-1)/a$. If weaker modes persist longer, $r>0$ replaces $a$ by $a+r$.
 
-The noise term creates two regimes. For fixed $\sigma>0$, if $1<b\le p$, the
-frontier $M\asymp B^{1/p}$ gives rate $B^{-(b-1)/p}$. If $b>p$, the best model
-for this estimator satisfies $M_\star\asymp(B/\sigma^2)^{1/b}$ and achieves
-$(\sigma^2/B)^{(b-1)/b}$.
+\paragraph{Proof mechanism.}
+Since $q_j\asymp j^{-p}$, the critical mode
+\begin{equation}
+J_B\asymp B^{1/p}
+\label{eq:critical-mode}
+\end{equation}
+satisfies $Bq_{J_B}\asymp1$.  Modes $j\ll J_B$ are observed many times,
+whereas modes $j\gg J_B$ are usually unseen.  Splitting the target-weighted
+missing mass at $J_B$ gives
+$\sum_j s_j(1-q_j)^B\asymp J_B^{1-b}$, while summing
+Equation~\eqref{eq:reciprocal-count} gives
+$B^{-1}\min\{M,J_B\}$.  The supplement proves both directions uniformly in
+$M$: when the critical annulus lies beyond the model, the approximation tail
+itself supplies the lower bound; otherwise unseen modes in the annulus do.
+Uniform persistence has $r=0$ and retains exponent $(b-1)/a$.  Increasing
+persistence in weak modes replaces $a$ by $a+r$.
+
+Beyond the exponent, the theory yields a complete crossover curve at the
+model--data frontier.
+
+\begin{proposition}[Scaling function]
+\label{prop:scaling-function}
+Suppose $q_j=c_qj^{-p}$ and $s_j=c_sj^{-b}$ exactly, and let
+$M_B/B^{1/p}\to m\in(0,\infty)$.  With $\beta=(b-1)/p$, the noiseless risk
+satisfies
+\begin{align}
+B^\beta\E\risk\longrightarrow c_s\bigg[
+\frac{m^{1-b}}{b-1}
++\frac{c_q^{-\beta}}{p}
+\Gamma\!\left(\beta,c_qm^{-p}\right)\bigg],
+\label{eq:scaling-function-main}
+\end{align}
+where $\Gamma(\beta,x)$ is the upper incomplete Gamma function.
+\end{proposition}
+The first term is the model tail and the second is the limiting weighted
+missing mass.  The proof controls the binomial-to-Poisson replacement
+uniformly before taking a Riemann limit.  Proposition~\ref{prop:scaling-function}
+explains the phase collapse in Figure~\ref{fig:theory-summary}, rather than
+only its asymptotic slopes.
+
+\paragraph{Noise regimes.}
+For fixed $\sigma>0$ and $1<b\le p$, choosing
+$M\asymp B^{1/p}$ gives the coverage-limited rate
+$B^{-(b-1)/p}$; the variance term decays at least as fast.  If $b>p$, the
+target tail is smoother and noise becomes the bottleneck.  Balancing model
+bias with $\sigma^2M/B$ yields
+\begin{equation}
+M_\star\asymp(B/\sigma^2)^{1/b},
+\qquad
+\E\risk\asympconst(\sigma^2/B)^{(b-1)/b}.
+\label{eq:smooth-noise-regime}
+\end{equation}
+Thus temporal persistence controls hard-target coverage, while sufficiently
+smooth targets eventually recover a familiar variance-limited exponent.
 
 \begin{theorem}[Exact noiseless minimax risk]
 \label{thm:minimax}
 Fix positive $(s_j)$ and let
 $\Theta_s=\{\theta^\omega:\theta_j^\omega=\omega_j\sqrt{s_j/\lambda_j},
-\ \omega_j\in\{-1,1\}\}$. Among estimators supported on the first $M$ modes,
+\ \omega_j\in\{-1,1\}\}$.  Among estimators supported on the first $M$ modes,
 when $\sigma=0$,
 \begin{equation}
 \inf_{\widetilde\theta}\sup_{\theta\in\Theta_s}
@@ -71,8 +111,9 @@ when $\sigma=0$,
 \label{eq:minimax}
 \end{equation}
 \end{theorem}
-The upper bound is attained by Equation~\eqref{eq:estimator}. For the lower
-bound, put independent Rademacher priors on the signs. Conditional on mode $j$
-being unseen, its sign remains independent of the data and incurs Bayes risk
-$s_j$. Thus the exponent change is information-theoretic, not an optimizer
-artifact.
+The upper bound is attained by Equation~\eqref{eq:estimator}.  For the lower
+bound, assign independent Rademacher priors to the signs.  Conditional on mode
+$j$ being unseen, the likelihood is independent of its sign, its posterior
+remains symmetric, and every estimator incurs Bayes prediction error at least
+$s_j$.  The equality makes the coverage interpretation exact: additional
+optimization on the same blocks cannot improve the innovation-limited term.

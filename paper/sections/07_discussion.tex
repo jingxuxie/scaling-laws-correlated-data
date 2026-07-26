@@ -1,28 +1,58 @@
 \section{Discussion and Limitations}
 
-\paragraph{What is established.}
-Two streams can share the same one-time covariance and the same number of raw
-observations yet have different exponents. The decisive object in our model is
-the innovation spectrum $\lambda_j/\tau_j$. Uniform persistence produces a
-horizontal shift; persistence increasing toward weak modes moves the
-model--data frontier. Heavy stationary dwell times add a second, explicitly
-quantified phase through residual life.
+\paragraph{What the theory establishes.}
+The marginal spectrum alone does not determine a learning curve for persistent
+data.  Two streams can share the same one-time covariance, target, nominal
+sample count, and even trace integrated autocorrelation, yet have different
+exponents.  In spectral renewal regression the decisive object is the
+innovation spectrum $\lambda_j/\tau_j$.  Uniform persistence produces a
+constant horizontal shift, whereas persistence increasing toward weak modes
+moves the model--data and compute-optimal frontiers.  Stationary heavy dwell
+times create a second, separately identifiable phase through forward residual
+life.
+
+The results also clarify the role of data reuse.  More epochs can reduce
+optimization error on modes present in the dataset, as in existing multi-pass
+scaling laws, but they cannot reveal a missing sign in the minimax construction.
+The relevant intervention is therefore not always more computation on the same
+trajectory.  It may be additional temporal, environmental, or population
+diversity that increases the innovation rate of late predictive modes.
 
 \paragraph{What is not claimed.}
 The theorem does not state that every dependent Gaussian design has exponent
-$(b-1)/(a+r)$. The dense AR control shows why: when every sample contains every
-mode, temporal correlation need not create an occupancy bottleneck. General
-processes may combine innovation coverage, sample-covariance concentration,
-and optimization effects. Characterizing that decomposition for arbitrary
-noncommuting space--time operators remains open. Representation invariance also
-assumes the dense map is known; the ambient minimum-norm result is empirical.
-Finally, the real-data proxy estimates $\tau_j$ after PCA and ignores
-uncertainty in spectral alignment. A broader benchmark is needed before its
-improvement can be treated as universal.
+$(b-1)/(a+r)$.  The dense AR control shows why: when every sample contains every
+mode, temporal correlation need not create an occupancy bottleneck.  General
+processes may combine at least three effects--innovation coverage,
+sample-covariance concentration, and optimization under dependent gradients.
+Characterizing their interaction for arbitrary noncommuting space--time
+operators remains open.
 
-\paragraph{Practical implication.}
-A data audit should measure not only variance in direction $j$, but how often
-that direction is refreshed. If late spectral directions arrive in long
-bursts, more contiguous logging may be less valuable than increasing temporal,
-environmental, or population diversity. A global effective sample size can
-hide precisely this allocation decision.
+Representation invariance assumes that the dense map is known, while the
+ambient minimum-norm extension is empirical.  The noisy raw-horizon theorem is
+sharp in the hard-target regime but does not give a matching minimax result for
+all smooth targets.  The equilibrium theorem uses deterministic dwell lengths;
+geometric or generally random durations preserve the main intuition but can
+change constants and inverse-run-length corrections.  Finally, the real-data
+proxy estimates $\tau_j$ after PCA, treats the estimated spectral basis as
+fixed, and evaluates one dataset.  A broader benchmark with uncertainty-aware
+mode matching is needed before the diagnostic can be treated as universal.
+
+\paragraph{Practical diagnostic.}
+The analysis suggests a concrete audit for sequential training data.  Estimate
+(i) marginal spectral mass $\widehat\lambda_j$, (ii) task energy
+$\widehat s_j$, and (iii) mode-wise refresh or autocorrelation time
+$\widehat\tau_j$.  Compare learning-curve forecasts based on
+$\widehat\lambda_j$ with those based on
+$\widehat\lambda_j/\widehat\tau_j$, and include a randomized-order control.
+A persistence correction that helps contiguous windows but not shuffled data
+is evidence for a temporal information bottleneck.  Conversely, if dense
+sampling already excites all relevant modes, a global correlation correction
+or covariance-aware ridge theory may be more appropriate.
+
+\paragraph{Broader implication.}
+A scalar effective sample size answers ``how many independent observations is
+this trajectory worth on average?''  Scaling laws require the more directional
+question ``which predictive modes have received independent information?''
+When late modes arrive in long bursts, collecting a longer contiguous log can
+be less valuable than increasing coverage, even if both interventions add the
+same number of rows to a dataset.

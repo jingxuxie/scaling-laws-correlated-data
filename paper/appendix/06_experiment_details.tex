@@ -65,3 +65,26 @@ dense dictionary and runs without a GPU. Commands, exact seeds, unit tests,
 CSV tables, JSON summaries, and figure-generation scripts are included in the
 repository. The real-data workflow downloads the public source file, records
 its URL, and uploads all outputs as a CI artifact.
+
+\subsection{Matched-IAT and compute-optimal experiments}
+For the matched-effective-sample-size experiment, we take
+$(a,b,r)=(2,1.8,0.8)$ and trace IAT 15, corresponding to
+$T=(15+1)/2=8$.  The aligned dwell scale is
+\[
+c=\frac{T}{\E_\lambda[J^r]}
+=T\frac{\zeta(a)}{\zeta(a-r)}.
+\]
+The uniform profile uses $\tau_j=T$ and innovation exponent $a$; the aligned
+profile uses $\tau_j=cj^r$ and innovation exponent $a+r$.  We simulate the
+stationary reversible refresh chain blockwise.  The initial mode is sampled
+from $\lambda$, subsequent refresh modes from $q$, and dwell lengths are
+geometric with the prescribed means.  Risk is one minus the normalized source
+energy of all distinct modeled modes touched by time $N$.  We use 300
+trajectories at each $N=2^8,\ldots,2^{18}$ and fit the final six scales.
+
+For compute allocation, we evaluate the exact noiseless risk for budgets
+$C=2^{12},\ldots,2^{30}$ and $r\in\{0,0.4,0.8\}$.  At each budget we search 300
+logarithmically spaced integer model sizes up to 8192 and set
+$B=\lfloor C/M\rfloor$.  The final seven budgets determine the reported risk,
+model, and innovation exponents.  Increasing the grid to 600 points changes
+all fitted exponents by less than $3\times10^{-3}$.
