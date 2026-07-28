@@ -22,6 +22,9 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 import matplotlib.pyplot as plt
+
+# Embed TrueType fonts in PDFs so AAAI preflight does not report Type 3 fonts.
+plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42})
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 from scipy.special import zeta

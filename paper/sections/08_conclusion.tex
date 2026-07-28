@@ -1,10 +1,13 @@
 \section{Conclusion}
 
-We separated the marginal spectrum of a task from the innovation spectrum of a
-persistent stream. Their mismatch yields an exact, minimax scaling law in
+We separated the marginal spectrum of a prediction task from the innovation
+spectrum of a persistent stream.  Their mismatch yields an exact minimax law in
 which mode-dependent persistence changes the data exponent, while uniform
-persistence changes only constants. Raw-horizon, heavy-tail, noise, dense
+persistence changes only constants.  A matched-integrated-autocorrelation
+construction shows directly why one global effective sample size can miss the
+slope, and the resulting compute law shifts optimal resources from model size
+toward innovation diversity.  Raw-horizon, heavy-tail, noise, dense
 representation, and negative-control results identify both the reach and the
-boundary of this mechanism. The broader lesson is that scaling with dependent
-data is governed by how quickly new predictive directions arrive, not by one
-scalar count of correlated observations.
+boundary of the mechanism.  The broader lesson is that scaling with dependent
+data is governed by how quickly new predictive directions arrive, not only by
+how many correlated rows are logged.

@@ -1,0 +1,158 @@
+\section{Beyond a Scalar Effective Sample Size}
+\label{sec:ess}
+
+Theorem~\ref{thm:scaling} suggests a mode-wise replacement for the usual
+scalar effective sample size.  After $B$ refreshes, mode $j$ has expected
+innovation count
+\begin{equation}
+Bq_j
+=\frac{B}{Z}\frac{\lambda_j}{\tau_j}.
+\label{eq:mode-wise-information}
+\end{equation}
+Thus $\lambda_j$ measures how much test risk lies in a direction, whereas
+$\lambda_j/\tau_j$ measures how rapidly independent information about that
+direction arrives.  A mode becomes statistically visible near $Bq_j\asymp1$.
+The full vector $(Bq_j)_j$, rather than one global count, determines the
+learnable spectral resolution.
+
+\paragraph{A matched-autocorrelation counterexample.}
+The distinction can be made formal using the reversible Markov realization of
+the supplement.  Its lag-$\ell$ covariance is
+\begin{equation}
+C(\ell)=\sum_{j\ge1}\lambda_j
+(1-\tau_j^{-1})^\ell e_je_j^\top.
+\label{eq:mode-covariance-main}
+\end{equation}
+A natural global summary is the trace integrated autocorrelation time
+\begin{equation}
+\tau_{\rm tr}
+:=1+2\sum_{\ell\ge1}
+\frac{\operatorname{tr}C(\ell)}{\operatorname{tr}C(0)}
+=2\sum_j\lambda_j\tau_j-1.
+\label{eq:trace-iat}
+\end{equation}
+It is the variance-inflation factor obtained by averaging autocorrelation over
+the marginal spectral mass, analogous to the integrated autocorrelation time
+used in time-series and Markov-chain Monte Carlo diagnostics
+\cite{geyer1992practical}.  The next proposition shows that even this
+well-matched scalar does not determine the learning exponent.
+
+\begin{proposition}[Same global autocorrelation, different scaling]
+\label{prop:matched-iat}
+Let $\lambda_j=j^{-a}/\zeta(a)$ and $s_j=j^{-b}/\zeta(b)$, where $a>1$ and
+$1<b<a+r+1$.  Fix $0<r<a-1$, define
+$m_r=\sum_j\lambda_jj^r<\infty$, and choose $T\ge m_r$.  Compare
+\begin{equation}
+\tau_j^{\rm unif}=T,
+\qquad
+\tau_j^{\rm align}=\frac{T}{m_r}j^r.
+\label{eq:matched-profiles}
+\end{equation}
+The two stationary streams have the same marginal covariance and the same
+trace autocorrelation $\tau_{\rm tr}=2T-1$.  Nevertheless, their innovation
+laws are
+\begin{equation}
+q_j^{\rm unif}=\frac{j^{-a}}{\zeta(a)},
+\qquad
+q_j^{\rm align}=\frac{j^{-(a+r)}}{\zeta(a+r)},
+\label{eq:matched-innovation-laws}
+\end{equation}
+and, when model truncation is nonbinding, their noiseless risks scale as
+$B^{-(b-1)/a}$ and $B^{-(b-1)/(a+r)}$, respectively.  The same two exponents
+hold for stationary raw horizons $N$.
+\end{proposition}
+
+\begin{proof}
+Equation~\eqref{eq:trace-iat} gives $2T-1$ for both profiles because
+$\sum_j\lambda_j(T/m_r)j^r=T$.  Normalizing
+$\lambda_j/\tau_j$ yields Equation~\eqref{eq:matched-innovation-laws}, and
+Theorem~\ref{thm:scaling} gives the two block exponents.  For raw horizons,
+Theorem~\ref{thm:raw} applies.  Since $r<a-1$, the equilibrium residual-life
+exponent $(a-1)/r$ exceeds one, while $(b-1)/(a+r)<1$, so the inspection term
+is asymptotically faster and does not change the aligned exponent.
+\end{proof}
+
+The proposition is deliberately specific: it does not rule out every possible
+scalar encoding of an entire process.  It does rule out the common practice of
+using a single global autocorrelation correction while ignoring how temporal
+persistence aligns with predictive spectral directions.  Two streams can
+receive exactly the same scalar correction $N/(2T-1)$ and still have different
+power-law slopes.  Figure~\ref{fig:mechanism-planning} verifies this
+construction directly.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{mechanism_planning.pdf}
+\caption{Why a scalar effective sample size is insufficient and how the
+replacement affects planning. (a) Uniform and spectrally aligned streams have
+the same marginal spectrum and are calibrated to the same trace integrated
+autocorrelation time, but the aligned innovation spectrum decays faster.
+(b) Stationary raw-horizon simulations recover different slopes despite the
+matched global autocorrelation. (c) Under dense-training cost $C=MB$,
+increasing persistence shifts the optimum toward more innovations and reduces
+the compute exponent.}
+\label{fig:mechanism-planning}
+\end{figure*}
+
+\paragraph{Data and compute planning.}
+The exponent has a direct sample-complexity interpretation.  In the noiseless
+data-limited regime, reaching risk $\eps$ requires
+\begin{equation}
+B_\eps\asymp \eps^{-(a+r)/(b-1)}.
+\label{eq:sample-complexity}
+\end{equation}
+Relative to uniform persistence, aligned persistence therefore multiplies the
+required number of innovations by
+$\eps^{-r/(b-1)}$.  The penalty grows as the desired error becomes smaller,
+which is why a constant-factor correction cannot repair the slope.
+
+For a stylized dense learner whose training cost is proportional to
+$C=MB$, the model and innovation terms can also be optimized jointly.
+
+\begin{corollary}[Compute-optimal frontier]
+\label{cor:compute-optimal}
+Let $p=a+r$ and suppose the noiseless power-law assumptions of
+Theorem~\ref{thm:scaling} hold.  Under $MB\le C$,
+\begin{align}
+M_\star&\asymp C^{1/(p+1)},
+&B_\star&\asymp C^{p/(p+1)}
+\label{eq:compute-allocation}\\
+\inf_{MB\le C}\E\risk
+&\asymp C^{-(b-1)/(p+1)}
+\label{eq:compute-rate}.
+\end{align}
+\end{corollary}
+
+\begin{proof}
+Choosing the allocations in Equation~\eqref{eq:compute-allocation} balances
+$M^{-(b-1)}$ and $B^{-(b-1)/p}$ and gives the upper bound.  Conversely, if
+$MB\le C$, then at least one of
+$M\lesssim C^{1/(p+1)}$ or $B\lesssim C^{p/(p+1)}$ must hold.  The
+corresponding term in Theorem~\ref{thm:scaling} gives the matching lower bound.
+\end{proof}
+
+Persistence therefore changes not only the achievable risk but the allocation
+rule: as $r$ grows, the optimal model exponent $1/(a+r+1)$ decreases and the
+innovation exponent $(a+r)/(a+r+1)$ increases.  Under this cost model, more of
+the budget should be spent obtaining distinct temporal or environmental
+coverage rather than enlarging a model that cannot access the missing modes.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Dominant asymptotic regimes, with $p=a+r$.  The full expressions and
+conditions are given in Theorems~\ref{thm:scaling}--\ref{thm:noisy-raw}.}
+\label{tab:regimes}
+\setlength{\tabcolsep}{1.5pt}%
+\begin{tabular}{@{}lp{0.33\columnwidth}p{0.29\columnwidth}@{}}
+\toprule
+Regime & Characteristic choice or condition & Dominant risk \\
+\midrule
+Model limited & $M\ll B^{1/p}$ & $M^{-(b-1)}$ \\
+Innovation limited & $M\gtrsim B^{1/p}$, $b\le p$ & $B^{-(b-1)/p}$ \\
+Noise limited & $b>p$, $M\asymp(B/\sigma^2)^{1/b}$ & $(\sigma^2/B)^{(b-1)/b}$ \\
+Compute optimal & $C=MB$ & $C^{-(b-1)/(p+1)}$ \\
+Stationary heavy dwell & $(a-1)/r<(b-1)/p$ & $N^{-(a-1)/r}$ \\
+\bottomrule
+\end{tabular}
+\end{table}

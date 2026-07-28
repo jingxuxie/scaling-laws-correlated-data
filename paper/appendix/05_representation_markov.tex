@@ -92,3 +92,52 @@ $J_t=j$, the only contribution correlated with $X_t$ is the event of no
 refresh during $\ell$ steps, with probability
 $(1-\tau_j^{-1})^\ell$. Any refresh resamples a mean-zero sign.
 \end{proof}
+
+\subsection{Matched global autocorrelation with different exponents}
+For the reversible chain above, define the trace integrated autocorrelation
+\[
+\tau_{\rm tr}
+=1+2\sum_{\ell\ge1}
+\frac{\operatorname{tr}\E[X_tX_{t+\ell}^\top]}
+{\operatorname{tr}\E[X_tX_t^\top]}.
+\]
+Since $\sum_j\lambda_j=1$, the covariance formula and the geometric series give
+\begin{align*}
+\tau_{\rm tr}
+&=1+2\sum_j\lambda_j\sum_{\ell\ge1}(1-\tau_j^{-1})^\ell\\
+&=1+2\sum_j\lambda_j(\tau_j-1)
+=2\sum_j\lambda_j\tau_j-1.
+\end{align*}
+
+Assume $\lambda_j=j^{-a}/\zeta(a)$ and choose $0<r<a-1$.  Then
+\[
+m_r:=\sum_j\lambda_jj^r=\frac{\zeta(a-r)}{\zeta(a)}<\infty.
+\]
+For $T\ge m_r$, both $\tau_j^{\rm unif}=T$ and
+$\tau_j^{\rm align}=(T/m_r)j^r$ are at least one, and both give
+$\tau_{\rm tr}=2T-1$.  On the other hand,
+\[
+q_j^{\rm unif}
+=\frac{\lambda_j/T}{\sum_k\lambda_k/T}
+=\frac{j^{-a}}{\zeta(a)},
+\]
+whereas
+\[
+q_j^{\rm align}
+=\frac{j^{-(a+r)}}{\zeta(a+r)}.
+\]
+The finite-block exponents follow from the power-law theorem.  For stationary
+raw horizons, the aligned residual exponent is $(a-1)/r>1$.  Under
+$1<b<a+r+1$, the innovation exponent $(b-1)/(a+r)$ is below one, so the
+residual term decays faster and the same two distinct slopes remain.  This
+proves the matched-autocorrelation proposition in the main paper.
+
+\subsection{Compute-optimal allocation}
+Let $d=b-1>0$ and $p=a+r$.  The noiseless risk is comparable to
+$M^{-d}+B^{-d/p}$.  Under $MB\le C$, choose
+$M\asymp C^{1/(p+1)}$ and $B\asymp C^{p/(p+1)}$ to obtain
+$O(C^{-d/(p+1)})$.  Conversely, for any feasible pair, at least one of
+$M\le C^{1/(p+1)}$ or $B\le C^{p/(p+1)}$ holds.  In the first case
+$M^{-d}\ge C^{-d/(p+1)}$; in the second,
+$B^{-d/p}\ge C^{-d/(p+1)}$.  Hence the rate and both allocation exponents are
+sharp up to constants.

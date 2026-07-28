@@ -8,6 +8,9 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+
+# Embed TrueType fonts in PDFs so AAAI preflight does not report Type 3 fonts.
+plt.rcParams.update({"pdf.fonttype": 42, "ps.fonttype": 42})
 import numpy as np
 from scipy.special import zeta
 
@@ -223,6 +226,105 @@ def build_figures(root: Path) -> None:
 
     fig.tight_layout()
     fig.savefig(figures / "validation_summary.pdf", bbox_inches="tight")
+    plt.close(fig)
+
+    matched_dir = root / "results" / "matched_ess_compute"
+    with (matched_dir / "summary.json").open(encoding="utf-8") as handle:
+        matched_payload = json.load(handle)
+    matched_summary = matched_payload["matched_ess"]
+
+    matched_rows: dict[str, list[dict[str, float]]] = {"uniform": [], "aligned": []}
+    with (matched_dir / "matched_ess.csv").open(encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            matched_rows[row["profile"]].append(
+                {
+                    "raw_horizon": float(row["raw_horizon"]),
+                    "mean_risk": float(row["mean_risk"]),
+                    "stderr": float(row["stderr"]),
+                }
+            )
+
+    compute_rows: dict[float, list[dict[str, float]]] = {}
+    with (matched_dir / "compute_optimal.csv").open(encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            r_value = float(row["r"])
+            compute_rows.setdefault(r_value, []).append(
+                {
+                    "compute_budget": float(row["compute_budget"]),
+                    "optimal_risk": float(row["optimal_risk"]),
+                    "optimal_model_size": float(row["optimal_model_size"]),
+                    "optimal_innovation_blocks": float(row["optimal_innovation_blocks"]),
+                }
+            )
+
+    fig, axes = plt.subplots(1, 3, figsize=(12.0, 3.35))
+    modes = np.arange(1, 400, dtype=np.float64)
+    marginal = modes ** (-a) / zeta(a, 1.0)
+    aligned_q = modes ** (-(a + 0.8)) / zeta(a + 0.8, 1.0)
+    axes[0].loglog(modes, marginal, linewidth=1.4, label=r"marginal $\lambda_j$ (both streams)")
+    axes[0].loglog(modes, marginal, "--", linewidth=1.2, label=r"uniform innovation $q_j$")
+    axes[0].loglog(modes, aligned_q, "-.", linewidth=1.2, label=r"aligned innovation $q_j$")
+    axes[0].set_xlabel("spectral mode $j$")
+    axes[0].set_ylabel("probability mass")
+    axes[0].set_title("(a) Marginal vs. innovation spectrum")
+    axes[0].grid(True, which="both", linewidth=0.3, alpha=0.5)
+    axes[0].legend(frameon=False, fontsize=6.5)
+    axes[0].text(
+        0.04,
+        0.05,
+        rf"both trace IAT $={matched_summary['trace_iat_target']:.0f}$",
+        transform=axes[0].transAxes,
+        fontsize=7,
+    )
+
+    for profile_name, marker in [("uniform", "o"), ("aligned", "s")]:
+        rows = matched_rows[profile_name]
+        rows.sort(key=lambda row: row["raw_horizon"])
+        predicted = matched_summary[f"{profile_name}_predicted_exponent"]
+        fitted = matched_summary[f"{profile_name}_fitted_exponent"]
+        axes[1].errorbar(
+            [row["raw_horizon"] for row in rows],
+            [row["mean_risk"] for row in rows],
+            yerr=[row["stderr"] for row in rows],
+            marker=marker,
+            markersize=3,
+            linewidth=1.1,
+            capsize=2,
+            label=(
+                rf"{profile_name}: fit $-{fitted:.3f}$, "
+                rf"pred. $-{predicted:.3f}$"
+            ),
+        )
+    axes[1].set_xscale("log")
+    axes[1].set_yscale("log")
+    axes[1].set_xlabel("raw trajectory length $N$")
+    axes[1].set_ylabel("excess risk")
+    axes[1].set_title("(b) A scalar ESS misses the slope")
+    axes[1].grid(True, which="both", linewidth=0.3, alpha=0.5)
+    axes[1].legend(frameon=False, fontsize=6.5)
+
+    for r_value, rows in sorted(compute_rows.items()):
+        rows.sort(key=lambda row: row["compute_budget"])
+        summary = matched_payload["compute"][str(r_value)]
+        axes[2].loglog(
+            [row["compute_budget"] for row in rows],
+            [row["optimal_risk"] for row in rows],
+            marker="o",
+            markersize=2.7,
+            linewidth=1.1,
+            label=(
+                rf"$r={r_value:g}$: fit $-{summary['fitted_risk_exponent']:.3f}$, "
+                rf"pred. $-{summary['predicted_risk_exponent']:.3f}$"
+            ),
+        )
+    axes[2].set_xlabel(r"dense compute budget $C=MB$")
+    axes[2].set_ylabel("minimum exact risk")
+    axes[2].set_title("(c) Compute-optimal frontier")
+    axes[2].grid(True, which="both", linewidth=0.3, alpha=0.5)
+    axes[2].legend(frameon=False, fontsize=6.2)
+
+    fig.tight_layout()
+    fig.savefig(figures / "mechanism_planning.pdf", bbox_inches="tight")
     plt.close(fig)
 
 
